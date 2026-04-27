@@ -68,7 +68,7 @@ def _storage_mode() -> str:
     configured = _get_secret("TENSION974_STORAGE")
     if configured:
         return str(configured).strip().lower()
-    if _get_secret("GOOGLE_SERVICE_ACCOUNT_JSON") and _get_secret("GOOGLE_SHEET_ID"):
+    if _has_google_credentials() and _get_secret("GOOGLE_SHEET_ID"):
         return "google_sheets"
     if Path.cwd().as_posix().startswith("/mount/src/"):
         return "google_sheets"
@@ -84,18 +84,44 @@ def _google_sheet(service_account_json: str, sheet_id: str):
     return client.open_by_key(sheet_id)
 
 
+def _has_google_credentials() -> bool:
+    if _get_secret("GOOGLE_SERVICE_ACCOUNT_JSON"):
+        return True
+    try:
+        return bool(st.secrets.get("google_service_account"))
+    except Exception:
+        return False
+
+
+def _google_credentials_json() -> str:
+    raw_json = _get_secret("GOOGLE_SERVICE_ACCOUNT_JSON")
+    if raw_json:
+        if not isinstance(raw_json, str):
+            return json.dumps(dict(raw_json), sort_keys=True)
+        try:
+            return json.dumps(json.loads(raw_json), sort_keys=True)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(
+                "GOOGLE_SERVICE_ACCOUNT_JSON n'est pas un JSON valide. "
+                "Utilise plutot le format [google_service_account] dans les secrets Streamlit."
+            ) from exc
+
+    try:
+        credentials = st.secrets.get("google_service_account")
+    except Exception:
+        credentials = None
+    if not credentials:
+        raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON ou [google_service_account] est absent.")
+    return json.dumps(dict(credentials), sort_keys=True)
+
+
 def _read_google_worksheet(name: str) -> pd.DataFrame:
-    service_account_json = _get_secret("GOOGLE_SERVICE_ACCOUNT_JSON")
     sheet_id = _get_secret("GOOGLE_SHEET_ID")
 
-    if not service_account_json:
-        raise RuntimeError("GOOGLE_SERVICE_ACCOUNT_JSON est absent.")
     if not sheet_id:
         raise RuntimeError("GOOGLE_SHEET_ID est absent.")
-    if not isinstance(service_account_json, str):
-        service_account_json = json.dumps(dict(service_account_json))
 
-    sheet = _google_sheet(service_account_json, str(sheet_id))
+    sheet = _google_sheet(_google_credentials_json(), str(sheet_id))
     try:
         records = sheet.worksheet(name).get_all_records()
     except Exception as exc:

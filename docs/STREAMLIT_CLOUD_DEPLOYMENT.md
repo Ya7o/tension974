@@ -31,10 +31,25 @@ Dans l'application Streamlit Cloud, ouvrir `Settings` puis `Secrets` et ajouter 
 ```toml
 TENSION974_STORAGE = "google_sheets"
 GOOGLE_SHEET_ID = "your_google_sheet_id"
-GOOGLE_SERVICE_ACCOUNT_JSON = """paste_the_full_google_service_account_json_here"""
+
+[google_service_account]
+type = "service_account"
+project_id = "your-project-id"
+private_key_id = "replace-me"
+private_key = """
+paste the private_key value here
+with its real line breaks
+"""
+client_email = "your-service-account@your-project.iam.gserviceaccount.com"
+client_id = "replace-me"
+auth_uri = "https://accounts.google.com/o/oauth2/auth"
+token_uri = "https://oauth2.googleapis.com/token"
+auth_provider_x509_cert_url = "https://www.googleapis.com/oauth2/v1/certs"
+client_x509_cert_url = "https://www.googleapis.com/robot/v1/metadata/x509/your-service-account%40your-project.iam.gserviceaccount.com"
+universe_domain = "googleapis.com"
 ```
 
-`GOOGLE_SERVICE_ACCOUNT_JSON` doit contenir le JSON complet du Service Account, colle en une valeur multi-ligne TOML. Ne pas ajouter de fichier `credentials.json` dans le repo.
+Le format `[google_service_account]` evite les erreurs JSON autour de `private_key`. Ne pas ajouter de fichier `credentials.json` dans le repo.
 
 ## Verifier
 

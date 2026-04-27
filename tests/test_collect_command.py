@@ -1,0 +1,38 @@
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from tension974 import collect
+from tension974.models import Observation
+
+
+def test_google_sheets_storage_requires_secrets(monkeypatch, capsys):
+    monkeypatch.delenv("GOOGLE_SERVICE_ACCOUNT_JSON", raising=False)
+    monkeypatch.delenv("GOOGLE_SHEET_ID", raising=False)
+
+    exit_code = collect.main(["--storage", "google_sheets"])
+
+    captured = capsys.readouterr()
+    assert exit_code == 1
+    assert "GOOGLE_SERVICE_ACCOUNT_JSON est manquant" in captured.err
+
+
+def test_sqlite_storage_command_still_runs(monkeypatch, tmp_path):
+    monkeypatch.setenv("DATABASE_PATH", str(tmp_path / "tension974.db"))
+
+    def fake_run_collection(config_path, provider, storage):
+        storage.initialize()
+        return [
+            Observation(
+                search_id="saint_denis_t3",
+                observed_at="2026-04-27T00:00:00+00:00",
+                status="success",
+                provider=provider.name,
+                total_listings_count=12,
+            )
+        ]
+
+    monkeypatch.setattr(collect, "run_collection_with_storage", fake_run_collection)
+
+    assert collect.main(["--storage", "sqlite"]) == 0

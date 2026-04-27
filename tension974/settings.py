@@ -25,3 +25,11 @@ def get_log_level() -> str:
 
 def get_log_file() -> str:
     return os.environ.get("LOG_FILE", "logs/tension974.log")
+
+
+def get_google_service_account_json() -> str | None:
+    return os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON") or None
+
+
+def get_google_sheet_id() -> str | None:
+    return os.environ.get("GOOGLE_SHEET_ID") or None

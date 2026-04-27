@@ -1,15 +1,11 @@
 import logging
 import yaml
 from datetime import datetime, timezone
-from pathlib import Path
 
 from .models import FetchResult, Observation, SearchConfig
 from .extraction import extract_total_listings_count
-from .database import (
-    init_db, upsert_search, insert_observation,
-    start_collection_run, finish_collection_run,
-)
 from .providers.base import FetchProvider
+from .storage import SQLiteStorage, Storage
 
 logger = logging.getLogger("tension974.collector")
 
@@ -36,7 +32,7 @@ def _now_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> Observation:
+def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, storage: Storage) -> Observation:
     logger.info("Collecting: %s (%s)", search.name, search.url)
     observed_at = _now_iso()
 
@@ -51,7 +47,7 @@ def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> 
             error_message=fetch.error_message,
             credits_used=fetch.credits_used,
         )
-        insert_observation(db_path, obs)
+        storage.insert_observation(obs)
         logger.warning("Collection failed for %s: %s", search.id, fetch.error_message)
         return obs
 
@@ -68,7 +64,7 @@ def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> 
             raw_total_listings_text=fetch.content[:500] if fetch.content else None,
             credits_used=fetch.credits_used,
         )
-        insert_observation(db_path, obs)
+        storage.insert_observation(obs)
         logger.warning("Could not extract count for %s", search.id)
         return obs
 
@@ -81,9 +77,15 @@ def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> 
         raw_total_listings_text=raw_text,
         credits_used=fetch.credits_used,
     )
-    insert_observation(db_path, obs)
+    storage.insert_observation(obs)
     logger.info("Collected %d annonces for %s", count, search.id)
     return obs
+
+
+def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> Observation:
+    storage = SQLiteStorage(db_path)
+    storage.initialize()
+    return collect_one_with_storage(search, provider, storage)
 
 
 def _find_raw_text(content: str) -> str | None:
@@ -93,23 +95,35 @@ def _find_raw_text(content: str) -> str | None:
 
 
 def run_collection(config_path: str, db_path: str, provider: FetchProvider) -> list[Observation]:
-    init_db(db_path)
+    return run_collection_with_storage(config_path, provider, SQLiteStorage(db_path))
+
+
+def run_collection_with_storage(
+    config_path: str,
+    provider: FetchProvider,
+    storage: Storage,
+) -> list[Observation]:
+    storage.initialize()
     searches = load_searches(config_path)
     active = [s for s in searches if s.active]
 
-    run_id = start_collection_run(db_path, provider.name)
+    run_id = storage.start_run(provider.name)
     results = []
     errors = []
 
-    for search in active:
-        upsert_search(db_path, search)
-        obs = collect_one(search, provider, db_path)
-        results.append(obs)
-        if obs.status != "success":
-            errors.append(obs)
+    try:
+        for search in active:
+            storage.upsert_search(search)
+            obs = collect_one_with_storage(search, provider, storage)
+            results.append(obs)
+            if obs.status != "success":
+                errors.append(obs)
 
-    status = "success" if not errors else ("partial" if results else "failed")
-    err_msg = "; ".join(o.error_message or "" for o in errors) if errors else None
-    finish_collection_run(db_path, run_id, status, err_msg)
+        status = "success" if not errors else ("partial" if results else "failed")
+        err_msg = "; ".join(o.error_message or "" for o in errors) if errors else None
+        storage.finish_run(run_id, status, err_msg)
+    except Exception as exc:
+        storage.finish_run(run_id, "failed", str(exc))
+        raise
 
     return results

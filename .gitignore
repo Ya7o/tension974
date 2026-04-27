@@ -1,10 +1,16 @@
 .env
+*.env
 secrets.env
+credentials.json
+service-account.json
+google-service-account.json
 
 __pycache__/
 *.py[cod]
 .pytest_cache/
 
+*.sqlite
+*.db
 data/*.db
 data/*.sqlite
 data/*.sqlite3

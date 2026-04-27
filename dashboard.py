@@ -65,7 +65,12 @@ def _get_secret(name: str) -> str | dict[str, Any] | None:
 
 
 def _storage_mode() -> str:
-    return str(_get_secret("TENSION974_STORAGE") or "sqlite").strip().lower()
+    configured = _get_secret("TENSION974_STORAGE")
+    if configured:
+        return str(configured).strip().lower()
+    if _get_secret("GOOGLE_SERVICE_ACCOUNT_JSON") and _get_secret("GOOGLE_SHEET_ID"):
+        return "google_sheets"
+    return "sqlite"
 
 
 @st.cache_resource(show_spinner=False)
@@ -261,12 +266,17 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
+st.caption(f"Source de donnees : {source_label} - {len(observations)} releve(s)")
+
 if not searches:
     st.warning("Aucune recherche active.")
     st.stop()
 
 if observations.empty:
-    st.info("Aucun releve disponible pour le moment.")
+    st.info(
+        "Aucun releve disponible pour le moment. "
+        f"Source actuellement utilisee : {source_label}."
+    )
     st.stop()
 
 success_observations = observations[observations["success"]]

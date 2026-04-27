@@ -1,6 +1,7 @@
 .env
 *.env
 secrets.env
+.streamlit/secrets.toml
 credentials.json
 service-account.json
 google-service-account.json

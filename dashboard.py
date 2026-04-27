@@ -70,6 +70,8 @@ def _storage_mode() -> str:
         return str(configured).strip().lower()
     if _get_secret("GOOGLE_SERVICE_ACCOUNT_JSON") and _get_secret("GOOGLE_SHEET_ID"):
         return "google_sheets"
+    if Path.cwd().as_posix().startswith("/mount/src/"):
+        return "google_sheets"
     return "sqlite"
 
 

@@ -124,14 +124,34 @@ def _read_google_worksheet(name: str) -> pd.DataFrame:
     sheet = _google_sheet(_google_credentials_json(), str(sheet_id))
     try:
         worksheet = _find_worksheet(sheet, name)
-        records = worksheet.get_all_records()
+        return _worksheet_to_dataframe(worksheet)
     except Exception as exc:
         available = ", ".join(w.title for w in sheet.worksheets()) or "aucun"
         raise RuntimeError(
-            f"Onglet Google Sheets introuvable ou illisible: {name}. "
-            f"Onglets disponibles: {available}"
+            f"Onglet Google Sheets illisible: {name}. "
+            f"Onglets disponibles: {available}. Detail: {exc}"
         ) from exc
-    return pd.DataFrame(records)
+
+
+def _worksheet_to_dataframe(worksheet) -> pd.DataFrame:
+    values = worksheet.get_all_values()
+    if not values:
+        return pd.DataFrame()
+
+    headers = _dedupe_headers(values[0])
+    rows = values[1:]
+    return pd.DataFrame(rows, columns=headers)
+
+
+def _dedupe_headers(headers: list[str]) -> list[str]:
+    seen: dict[str, int] = {}
+    result = []
+    for index, header in enumerate(headers):
+        name = header.strip() or f"column_{index + 1}"
+        count = seen.get(name, 0)
+        seen[name] = count + 1
+        result.append(name if count == 0 else f"{name}_{count + 1}")
+    return result
 
 
 def _find_worksheet(sheet, name: str):

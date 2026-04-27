@@ -123,10 +123,35 @@ def _read_google_worksheet(name: str) -> pd.DataFrame:
 
     sheet = _google_sheet(_google_credentials_json(), str(sheet_id))
     try:
-        records = sheet.worksheet(name).get_all_records()
+        worksheet = _find_worksheet(sheet, name)
+        records = worksheet.get_all_records()
     except Exception as exc:
-        raise RuntimeError(f"Onglet Google Sheets introuvable ou illisible: {name}") from exc
+        available = ", ".join(w.title for w in sheet.worksheets()) or "aucun"
+        raise RuntimeError(
+            f"Onglet Google Sheets introuvable ou illisible: {name}. "
+            f"Onglets disponibles: {available}"
+        ) from exc
     return pd.DataFrame(records)
+
+
+def _find_worksheet(sheet, name: str):
+    try:
+        return sheet.worksheet(name)
+    except Exception:
+        pass
+
+    wanted = name.strip().lower()
+    for worksheet in sheet.worksheets():
+        if worksheet.title.strip().lower() == wanted:
+            return worksheet
+
+    if name == "observations":
+        for worksheet in sheet.worksheets():
+            headers = [h.strip().lower() for h in worksheet.row_values(1)]
+            if {"search_id", "observed_at"}.issubset(set(headers)):
+                return worksheet
+
+    raise RuntimeError(name)
 
 
 def _as_bool(value: Any) -> bool:

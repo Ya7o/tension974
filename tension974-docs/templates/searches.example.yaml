@@ -1,0 +1,10 @@
+searches:
+  - id: saint_denis_t3
+    name: "Saint-Denis - T3"
+    platform: "leboncoin"
+    url: "https://www.leboncoin.fr/recherche?text=t3&locations=Saint-Denis_97400__-20.89076_55.45851_5000_1000&from=rs"
+    location: "Saint-Denis, La Réunion"
+    property_type: "T3"
+    metric: "total_listings_count"
+    expected_example_text: "242 annonces"
+    active: true

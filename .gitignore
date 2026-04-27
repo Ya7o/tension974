@@ -1,0 +1,15 @@
+.env
+secrets.env
+
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+data/*.db
+data/*.sqlite
+data/*.sqlite3
+logs/*.log
+exports/*
+!exports/.gitkeep
+
+.DS_Store

@@ -1,0 +1,7 @@
+# tension974 — collecte automatique à 21h15 chaque soir (heure de La Réunion = UTC+4)
+# 21h15 La Réunion = 17h15 UTC
+#
+# Pour éditer : crontab -e
+# Pour vérifier : crontab -l
+
+15 17 * * * cd /home/kali/tension974 && /usr/bin/python3 scripts/collect.py >> logs/cron.log 2>&1

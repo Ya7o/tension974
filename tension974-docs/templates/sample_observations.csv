@@ -1,0 +1,4 @@
+observed_at,search_id,total_listings_count,status,provider,error_message
+2026-04-26T21:15:00+04:00,saint_denis_t3,242,success,firecrawl,
+2026-04-27T21:15:00+04:00,saint_denis_t3,239,success,firecrawl,
+2026-04-28T21:15:00+04:00,saint_denis_t3,,failed,firecrawl,"counter not found"

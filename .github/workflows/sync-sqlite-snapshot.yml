@@ -1,0 +1,81 @@
+name: Sync SQLite snapshot to Google Sheets
+
+on:
+  workflow_dispatch:
+    inputs:
+      snapshot_b64:
+        description: "gzip+base64 JSON snapshot exported from local SQLite"
+        required: true
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    env:
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+      SNAPSHOT_B64: ${{ inputs.snapshot_b64 }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install gspread google-auth
+
+      - name: Replace Google Sheets tabs
+        run: |
+          python - <<'PY'
+          import base64
+          import gzip
+          import json
+          import os
+
+          import gspread
+
+          service_account_json = os.environ.get("GOOGLE_SERVICE_ACCOUNT_JSON")
+          sheet_id = os.environ.get("GOOGLE_SHEET_ID")
+          snapshot_b64 = os.environ.get("SNAPSHOT_B64")
+
+          if not service_account_json:
+              raise SystemExit("GOOGLE_SERVICE_ACCOUNT_JSON is missing")
+          if not sheet_id:
+              raise SystemExit("GOOGLE_SHEET_ID is missing")
+          if not snapshot_b64:
+              raise SystemExit("snapshot_b64 input is missing")
+
+          payload = json.loads(gzip.decompress(base64.b64decode(snapshot_b64)))
+          client = gspread.service_account_from_dict(json.loads(service_account_json))
+          spreadsheet = client.open_by_key(sheet_id)
+
+          tabs = {
+              "observations": payload.get("observations", []),
+              "runs": payload.get("collection_runs", []),
+              "searches": payload.get("searches", []),
+          }
+
+          for title, rows in tabs.items():
+              try:
+                  worksheet = spreadsheet.worksheet(title)
+              except Exception:
+                  worksheet = spreadsheet.add_worksheet(title=title, rows=1000, cols=20)
+
+              worksheet.clear()
+              if not rows:
+                  continue
+
+              headers = list(rows[0].keys())
+              values = [headers]
+              for row in rows:
+                  values.append(["" if row.get(header) is None else row.get(header) for header in headers])
+
+              worksheet.update(values, value_input_option="USER_ENTERED")
+              print(f"{title}: replaced with {len(rows)} row(s)")
+          PY

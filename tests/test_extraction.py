@@ -38,6 +38,7 @@ def test_extract_price_stats():
     stats = extract_price_stats("690 €\n850 €\n1 250 €")
 
     assert stats is not None
+    assert stats.median_price == 850
     assert stats.average_price == 930
     assert stats.sample_size == 3
     assert stats.min_price == 690
@@ -46,3 +47,15 @@ def test_extract_price_stats():
 
 def test_extract_price_stats_returns_none_without_prices():
     assert extract_price_stats("242 annonces sans prix visible") is None
+
+
+def test_extract_price_stats_caps_sample_to_first_30_prices():
+    prices = "\n".join(f"{500 + i} €" for i in range(35))
+
+    stats = extract_price_stats(prices)
+
+    assert stats is not None
+    assert stats.sample_size == 30
+    assert stats.min_price == 500
+    assert stats.max_price == 529
+    assert stats.median_price == 514

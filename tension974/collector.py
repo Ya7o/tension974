@@ -79,6 +79,7 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
         provider=fetch.provider,
         total_listings_count=count,
         raw_total_listings_text=raw_text,
+        median_price=price_stats.median_price if price_stats else None,
         average_price=price_stats.average_price if price_stats else None,
         price_sample_size=price_stats.sample_size if price_stats else None,
         min_price=price_stats.min_price if price_stats else None,
@@ -88,9 +89,10 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
     storage.insert_observation(obs)
     if price_stats:
         logger.info(
-            "Collected %d annonces for %s, average price=%d EUR (%d prices)",
+            "Collected %d annonces for %s, median price=%d EUR, average price=%d EUR (%d prices)",
             count,
             search.id,
+            price_stats.median_price,
             price_stats.average_price,
             price_stats.sample_size,
         )

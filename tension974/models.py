@@ -34,6 +34,7 @@ class Observation:
     provider: str
     total_listings_count: int | None = None
     raw_total_listings_text: str | None = None
+    median_price: int | None = None
     average_price: int | None = None
     price_sample_size: int | None = None
     min_price: int | None = None

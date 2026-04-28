@@ -1,11 +1,13 @@
 import re
 from dataclasses import dataclass
+from statistics import median
 
 
 _PATTERN = re.compile(
     r"(\d[\d\s ]*)\s*annonce",
     re.IGNORECASE,
 )
+_MAX_PRICE_SAMPLE_SIZE = 30
 
 _PRICE_PATTERN = re.compile(
     r"(?<![\w/])((?:\d{1,3}[\s ]\d{3})|\d{2,5})\s*(?:€|EUR|euros?)(?=$|[^\w])",
@@ -15,6 +17,7 @@ _PRICE_PATTERN = re.compile(
 
 @dataclass(frozen=True)
 class PriceStats:
+    median_price: int
     average_price: int
     sample_size: int
     min_price: int
@@ -56,7 +59,9 @@ def extract_price_stats(text: str) -> PriceStats | None:
     prices = extract_listing_prices(text)
     if not prices:
         return None
+    prices = prices[:_MAX_PRICE_SAMPLE_SIZE]
     return PriceStats(
+        median_price=round(median(prices)),
         average_price=round(sum(prices) / len(prices)),
         sample_size=len(prices),
         min_price=min(prices),

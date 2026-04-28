@@ -60,6 +60,26 @@ jobs:
               "runs": payload.get("collection_runs", []),
               "searches": payload.get("searches", []),
           }
+          canonical_headers = {
+              "observations": [
+                  "search_id",
+                  "observed_at",
+                  "total_listings_count",
+                  "raw_total_listings_text",
+                  "median_price",
+                  "average_price",
+                  "price_sample_size",
+                  "min_price",
+                  "max_price",
+                  "status",
+                  "provider",
+                  "error_message",
+                  "credits_used",
+                  "created_at",
+              ],
+              "runs": ["started_at", "finished_at", "status", "provider", "error_message"],
+              "searches": ["id", "name", "platform", "url", "location", "property_type", "active", "created_at"],
+          }
 
           for title, rows in tabs.items():
               try:
@@ -71,7 +91,7 @@ jobs:
               if not rows:
                   continue
 
-              headers = list(rows[0].keys())
+              headers = canonical_headers.get(title, list(rows[0].keys()))
               values = [headers]
               for row in rows:
                   values.append(["" if row.get(header) is None else row.get(header) for header in headers])

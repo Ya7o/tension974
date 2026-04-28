@@ -96,7 +96,7 @@ jobs:
                       row[1],
                       row[2],
                       row[3],
-                      "",
+                      row[4],
                       row[4],
                       row[5],
                       row[6],
@@ -118,6 +118,8 @@ jobs:
                       and fixed[13].isdigit()
                   ):
                       fixed[11], fixed[12], fixed[13] = "", fixed[13], fixed[11]
+                  if not fixed[4] and fixed[5]:
+                      fixed[4] = fixed[5]
                   repaired.append(fixed)
 
           worksheet.clear()

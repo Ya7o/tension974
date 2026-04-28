@@ -24,6 +24,21 @@ class FakeProvider(FetchProvider):
         return self._result
 
 
+class SequenceProvider(FetchProvider):
+    def __init__(self, results: list[FetchResult]):
+        self._results = results
+        self.calls = 0
+
+    @property
+    def name(self) -> str:
+        return "sequence"
+
+    def fetch(self, url: str) -> FetchResult:
+        result = self._results[min(self.calls, len(self._results) - 1)]
+        self.calls += 1
+        return result
+
+
 SEARCH = SearchConfig(
     id="saint_denis_t3",
     name="Saint-Denis - T3",
@@ -77,3 +92,17 @@ def test_collect_provider_error(tmp_db):
     rows = get_observations(tmp_db, "saint_denis_t3")
     assert len(rows) == 1
     assert rows[0]["status"] == "failed"
+
+
+def test_collect_retries_once_then_succeeds(tmp_db, monkeypatch):
+    monkeypatch.setattr("tension974.collector.time.sleep", lambda seconds: None)
+    provider = SequenceProvider([
+        FetchResult(success=False, provider="fake", error_message="Temporary error"),
+        FetchResult(success=True, content="Leboncoin\n\n242 annonces", provider="fake"),
+    ])
+
+    obs = collect_one(SEARCH, provider, tmp_db)
+
+    assert provider.calls == 2
+    assert obs.status == "success"
+    assert obs.total_listings_count == 242

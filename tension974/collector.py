@@ -1,4 +1,5 @@
 import logging
+import time
 import yaml
 from datetime import datetime, timezone
 
@@ -8,6 +9,8 @@ from .providers.base import FetchProvider
 from .storage import SQLiteStorage, Storage
 
 logger = logging.getLogger("tension974.collector")
+_MAX_FETCH_ATTEMPTS = 2
+_RETRY_DELAY_SECONDS = 5
 
 
 def load_searches(config_path: str) -> list[SearchConfig]:
@@ -36,7 +39,7 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
     logger.info("Collecting: %s (%s)", search.name, search.url)
     observed_at = _now_iso()
 
-    fetch: FetchResult = provider.fetch(search.url)
+    fetch: FetchResult = _fetch_with_retry(search, provider)
 
     if not fetch.success:
         obs = Observation(
@@ -94,6 +97,30 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
     else:
         logger.info("Collected %d annonces for %s", count, search.id)
     return obs
+
+
+def _fetch_with_retry(search: SearchConfig, provider: FetchProvider) -> FetchResult:
+    last_result: FetchResult | None = None
+    for attempt in range(1, _MAX_FETCH_ATTEMPTS + 1):
+        result = provider.fetch(search.url)
+        if result.success:
+            return result
+
+        last_result = result
+        if attempt < _MAX_FETCH_ATTEMPTS:
+            logger.warning(
+                "Fetch failed for %s, retrying once in %ss: %s",
+                search.id,
+                _RETRY_DELAY_SECONDS,
+                result.error_message,
+            )
+            time.sleep(_RETRY_DELAY_SECONDS)
+
+    return last_result or FetchResult(
+        success=False,
+        provider=provider.name,
+        error_message="Fetch failed without result.",
+    )
 
 
 def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> Observation:

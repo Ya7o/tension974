@@ -108,7 +108,17 @@ jobs:
                       row[12],
                   ])
               else:
-                  repaired.append(row[:len(headers)])
+                  fixed = row[:len(headers)]
+                  # Some old no-price rows had created_at shifted into
+                  # error_message and credits_used shifted into created_at.
+                  if (
+                      fixed[9] in {"success", "failed", "partial"}
+                      and fixed[10]
+                      and "T" in fixed[11]
+                      and fixed[13].isdigit()
+                  ):
+                      fixed[11], fixed[12], fixed[13] = "", fixed[13], fixed[11]
+                  repaired.append(fixed)
 
           worksheet.clear()
           worksheet.update(repaired, value_input_option="USER_ENTERED")

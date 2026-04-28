@@ -39,6 +39,10 @@ def init_db(db_path: str) -> None:
                 observed_at TEXT NOT NULL,
                 total_listings_count INTEGER,
                 raw_total_listings_text TEXT,
+                average_price INTEGER,
+                price_sample_size INTEGER,
+                min_price INTEGER,
+                max_price INTEGER,
                 status TEXT NOT NULL,
                 provider TEXT NOT NULL,
                 error_message TEXT,
@@ -61,6 +65,17 @@ def init_db(db_path: str) -> None:
             conn.execute("ALTER TABLE observations ADD COLUMN credits_used INTEGER")
         except Exception:
             pass
+    for column, column_type in (
+        ("average_price", "INTEGER"),
+        ("price_sample_size", "INTEGER"),
+        ("min_price", "INTEGER"),
+        ("max_price", "INTEGER"),
+    ):
+        with conn:
+            try:
+                conn.execute(f"ALTER TABLE observations ADD COLUMN {column} {column_type}")
+            except Exception:
+                pass
     conn.close()
 
 
@@ -101,14 +116,19 @@ def insert_observation(db_path: str, obs: Observation) -> int:
             """
             INSERT INTO observations
                 (search_id, observed_at, total_listings_count, raw_total_listings_text,
+                 average_price, price_sample_size, min_price, max_price,
                  status, provider, error_message, credits_used, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
                 obs.search_id,
                 obs.observed_at,
                 obs.total_listings_count,
                 obs.raw_total_listings_text,
+                obs.average_price,
+                obs.price_sample_size,
+                obs.min_price,
+                obs.max_price,
                 obs.status,
                 obs.provider,
                 obs.error_message,

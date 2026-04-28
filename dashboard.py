@@ -205,6 +205,9 @@ def _normalize_observations(df: pd.DataFrame) -> pd.DataFrame:
         df["date"] = df["collected_at"]
     if "count" not in df.columns:
         df["count"] = pd.NA
+    for column in ("average_price", "price_sample_size", "min_price", "max_price"):
+        if column not in df.columns:
+            df[column] = pd.NA
     if "success" not in df.columns:
         df["success"] = True
     if "provider" not in df.columns:
@@ -217,6 +220,8 @@ def _normalize_observations(df: pd.DataFrame) -> pd.DataFrame:
     df["collected_at"] = pd.to_datetime(df["collected_at"], errors="coerce", utc=True)
     df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.date
     df["count"] = pd.to_numeric(df["count"], errors="coerce").astype("Int64")
+    for column in ("average_price", "price_sample_size", "min_price", "max_price"):
+        df[column] = pd.to_numeric(df[column], errors="coerce").astype("Int64")
     df["success"] = df["success"].map(_as_bool)
     return df.sort_values("collected_at", ascending=False)
 
@@ -263,16 +268,30 @@ def _variation(observations: pd.DataFrame, days: int) -> tuple[int | None, str]:
     return delta, f"+{delta}" if delta >= 0 else str(delta)
 
 
-def _sparkline(observations: pd.DataFrame) -> go.Figure:
-    pts = observations[observations["success"] & observations["count"].notna()].sort_values("collected_at")
+def _price_variation(observations: pd.DataFrame, days: int) -> str:
+    success = observations[
+        observations["success"] & observations["average_price"].notna()
+    ].sort_values("collected_at")
+    if len(success) < 2:
+        return "-"
+    cutoff = datetime.now(timezone.utc) - timedelta(days=days)
+    old = success[success["collected_at"] <= cutoff]
+    if old.empty:
+        return "-"
+    delta = int(success.iloc[-1]["average_price"]) - int(old.iloc[-1]["average_price"])
+    return f"+{delta} EUR" if delta >= 0 else f"{delta} EUR"
+
+
+def _sparkline(observations: pd.DataFrame, column: str = "count", color: str = "#1f77b4") -> go.Figure:
+    pts = observations[observations["success"] & observations[column].notna()].sort_values("collected_at")
     fig = go.Figure()
     fig.add_trace(go.Scatter(
         x=pts["date"],
-        y=pts["count"],
+        y=pts[column],
         mode="lines+markers",
-        line=dict(color="#1f77b4", width=2),
+        line=dict(color=color, width=2),
         marker=dict(size=3),
-        hovertemplate="%{x}<br><b>%{y} annonces</b><extra></extra>",
+        hovertemplate="%{x}<br><b>%{y}</b><extra></extra>",
     ))
     fig.update_layout(
         height=155,
@@ -287,8 +306,14 @@ def _sparkline(observations: pd.DataFrame) -> go.Figure:
 
 def _history_table(observations: pd.DataFrame) -> pd.DataFrame:
     rows = observations[observations["success"]].sort_values("collected_at", ascending=False)
-    df = rows[["date", "count", "provider"]].copy()
-    return df.rename(columns={"date": "Date", "count": "Annonces", "provider": "Source"})
+    df = rows[["date", "count", "average_price", "price_sample_size", "provider"]].copy()
+    return df.rename(columns={
+        "date": "Date",
+        "count": "Annonces",
+        "average_price": "Prix moyen",
+        "price_sample_size": "Prix lus",
+        "provider": "Source",
+    })
 
 
 try:
@@ -363,14 +388,22 @@ kpi_cols = st.columns(3)
 for col, search in zip(kpi_cols, searches):
     obs = observations[observations["search_id"] == search.id]
     success = obs[obs["success"] & obs["count"].notna()].sort_values("collected_at", ascending=False)
+    price_success = obs[
+        obs["success"] & obs["average_price"].notna()
+    ].sort_values("collected_at", ascending=False)
 
     with col:
         st.markdown(f'<div class="section-title">{search.name}</div>', unsafe_allow_html=True)
         last = success.iloc[0] if not success.empty else None
         last_count = int(last["count"]) if last is not None else None
         last_date = last["date"].strftime("%Y-%m-%d") if last is not None and pd.notna(last["date"]) else "-"
+        last_price = int(price_success.iloc[0]["average_price"]) if not price_success.empty else None
+        price_sample = int(price_success.iloc[0]["price_sample_size"]) if (
+            not price_success.empty and pd.notna(price_success.iloc[0]["price_sample_size"])
+        ) else None
         _, var7 = _variation(obs, 7)
         _, var30 = _variation(obs, 30)
+        price_var30 = _price_variation(obs, 30)
 
         st.metric(
             label=f"Releve du {last_date}",
@@ -381,6 +414,9 @@ for col, search in zip(kpi_cols, searches):
         c1, c2 = st.columns(2)
         c1.caption(f"7 jours : **{var7}**")
         c2.caption(f"30 jours : **{var30}**")
+        if last_price is not None:
+            sample_label = f" ({price_sample} prix)" if price_sample else ""
+            st.caption(f"Prix moyen : **{last_price} EUR**{sample_label} | 30 jours : **{price_var30}**")
 
         if not success.empty:
             st.plotly_chart(
@@ -389,6 +425,13 @@ for col, search in zip(kpi_cols, searches):
                 config={"displayModeBar": False},
                 key=f"spark_{search.id}",
             )
+            if not price_success.empty:
+                st.plotly_chart(
+                    _sparkline(obs, column="average_price", color="#e05252"),
+                    use_container_width=True,
+                    config={"displayModeBar": False},
+                    key=f"price_{search.id}",
+                )
         else:
             st.info("Aucune donnee reussie")
 

@@ -34,6 +34,10 @@ class Observation:
     provider: str
     total_listings_count: int | None = None
     raw_total_listings_text: str | None = None
+    average_price: int | None = None
+    price_sample_size: int | None = None
+    min_price: int | None = None
+    max_price: int | None = None
     error_message: str | None = None
     credits_used: int | None = None
     created_at: str = ""

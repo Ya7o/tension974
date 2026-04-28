@@ -3,7 +3,7 @@ import yaml
 from datetime import datetime, timezone
 
 from .models import FetchResult, Observation, SearchConfig
-from .extraction import extract_total_listings_count
+from .extraction import extract_price_stats, extract_total_listings_count
 from .providers.base import FetchProvider
 from .storage import SQLiteStorage, Storage
 
@@ -53,6 +53,7 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
 
     count = extract_total_listings_count(fetch.content)
     raw_text = _find_raw_text(fetch.content)
+    price_stats = extract_price_stats(fetch.content)
 
     if count is None:
         obs = Observation(
@@ -75,10 +76,23 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
         provider=fetch.provider,
         total_listings_count=count,
         raw_total_listings_text=raw_text,
+        average_price=price_stats.average_price if price_stats else None,
+        price_sample_size=price_stats.sample_size if price_stats else None,
+        min_price=price_stats.min_price if price_stats else None,
+        max_price=price_stats.max_price if price_stats else None,
         credits_used=fetch.credits_used,
     )
     storage.insert_observation(obs)
-    logger.info("Collected %d annonces for %s", count, search.id)
+    if price_stats:
+        logger.info(
+            "Collected %d annonces for %s, average price=%d EUR (%d prices)",
+            count,
+            search.id,
+            price_stats.average_price,
+            price_stats.sample_size,
+        )
+    else:
+        logger.info("Collected %d annonces for %s", count, search.id)
     return obs
 
 

@@ -97,8 +97,8 @@ def test_collect_provider_error(tmp_db):
 def test_collect_retries_once_then_succeeds(tmp_db, monkeypatch):
     monkeypatch.setattr("tension974.collector.time.sleep", lambda seconds: None)
     provider = SequenceProvider([
-        FetchResult(success=False, provider="fake", error_message="Temporary error"),
-        FetchResult(success=True, content="Leboncoin\n\n242 annonces", provider="fake"),
+        FetchResult(success=False, provider="fake", error_message="Temporary error", credits_used=1),
+        FetchResult(success=True, content="Leboncoin\n\n242 annonces", provider="fake", credits_used=1),
     ])
 
     obs = collect_one(SEARCH, provider, tmp_db)
@@ -106,3 +106,4 @@ def test_collect_retries_once_then_succeeds(tmp_db, monkeypatch):
     assert provider.calls == 2
     assert obs.status == "success"
     assert obs.total_listings_count == 242
+    assert obs.credits_used == 2

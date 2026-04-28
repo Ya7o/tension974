@@ -103,9 +103,14 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
 
 def _fetch_with_retry(search: SearchConfig, provider: FetchProvider) -> FetchResult:
     last_result: FetchResult | None = None
+    total_credits = 0
     for attempt in range(1, _MAX_FETCH_ATTEMPTS + 1):
         result = provider.fetch(search.url)
+        if result.credits_used:
+            total_credits += result.credits_used
         if result.success:
+            if total_credits:
+                result.credits_used = total_credits
             return result
 
         last_result = result
@@ -118,7 +123,12 @@ def _fetch_with_retry(search: SearchConfig, provider: FetchProvider) -> FetchRes
             )
             time.sleep(_RETRY_DELAY_SECONDS)
 
-    return last_result or FetchResult(
+    if last_result:
+        if total_credits:
+            last_result.credits_used = total_credits
+        return last_result
+
+    return FetchResult(
         success=False,
         provider=provider.name,
         error_message="Fetch failed without result.",

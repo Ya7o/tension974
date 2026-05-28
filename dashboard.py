@@ -343,9 +343,6 @@ latest = observations["collected_at"].max() if not observations.empty else pd.Na
 source_label = "Google Sheets" if storage == "google_sheets" else "SQLite"
 
 with st.sidebar:
-    if st.button("Rafraichir les donnees", use_container_width=True):
-        st.cache_resource.clear()
-        st.rerun()
     st.subheader("Donnees")
     st.caption(f"Source : **{source_label}**")
     st.caption(f"Releves : **{len(observations)}**")

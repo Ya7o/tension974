@@ -186,6 +186,10 @@ def _as_bool(value: Any) -> bool:
     return text in {"1", "true", "yes", "y", "success", "ok"}
 
 
+def _parse_datetime_series(values: pd.Series) -> pd.Series:
+    return pd.to_datetime(values, errors="coerce", utc=True, format="mixed")
+
+
 def _normalize_observations(df: pd.DataFrame) -> pd.DataFrame:
     df = df.copy()
     if "collected_at" not in df.columns:
@@ -220,8 +224,8 @@ def _normalize_observations(df: pd.DataFrame) -> pd.DataFrame:
     if "error" not in df.columns:
         df["error"] = ""
 
-    df["collected_at"] = pd.to_datetime(df["collected_at"], errors="coerce", utc=True)
-    df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.date
+    df["collected_at"] = _parse_datetime_series(df["collected_at"])
+    df["date"] = _parse_datetime_series(df["date"]).dt.date
     df["count"] = pd.to_numeric(df["count"], errors="coerce").astype("Int64")
     for column in ("median_price", "average_price", "price_sample_size", "min_price", "max_price"):
         df[column] = pd.to_numeric(df[column], errors="coerce").astype("Int64")
@@ -255,7 +259,7 @@ def read_runs(storage: str) -> pd.DataFrame:
         return df
     for column in ("started_at", "finished_at"):
         if column in df.columns:
-            df[column] = pd.to_datetime(df[column], errors="coerce", utc=True)
+            df[column] = _parse_datetime_series(df[column])
     return df.sort_values("started_at", ascending=False) if "started_at" in df.columns else df
 
 

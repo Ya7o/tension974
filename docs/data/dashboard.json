@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-07T04:16:47.565343+00:00",
+  "generated_at": "2026-07-07T19:30:33.590533+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -8,23 +8,27 @@
       "property_type": "Studio",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+t2+NOT+f2+NOT+t3+NOT+f3&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&price=min-800&furnished=1&owner_type=all&sort=time&order=desc&from=ms&sa=2026-04-27T05%3A32%3A29.251404Z",
       "kpis": {
-        "latest_count": 88,
-        "latest_date": "2026-03-28",
+        "latest_count": 141,
+        "latest_date": "2026-07-02",
         "delta_7d": {
-          "delta": 0,
-          "from": 88,
-          "to": 88
+          "delta": -8,
+          "from": 149,
+          "to": 141
         },
         "delta_30d": {
-          "delta": 0,
-          "from": 88,
-          "to": 88
+          "delta": -4,
+          "from": 145,
+          "to": 141
         },
-        "latest_median_price": null,
-        "latest_average_price": null,
-        "price_sample_size": null,
-        "price_delta_30d": null,
-        "success_rate_30d": null,
+        "latest_median_price": 625,
+        "latest_average_price": 620,
+        "price_sample_size": 30,
+        "price_delta_30d": {
+          "delta": -25,
+          "from": 650,
+          "to": 625
+        },
+        "success_rate_30d": 1.0,
         "last_failure": null
       },
       "timeseries": [
@@ -423,6 +427,234 @@
           "provider": "historical_import",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:44:57.704457+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 98,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:48:13.100079+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 98,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:51:53.815451+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 98,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:00:55.882339+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 98,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:01:33.879607+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 98,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:05:35.867822+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 98,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T17:45:22.109541+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 99,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T06:29:40.012772+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 99,
+          "median_price": 643,
+          "average_price": 643,
+          "price_sample_size": 31,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T06:46:23.806063+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 99,
+          "median_price": 643,
+          "average_price": 643,
+          "price_sample_size": 31,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T07:22:53.201334+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 99,
+          "median_price": 640,
+          "average_price": 638,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-01T18:10:09.723871+00:00",
+          "date": "2026-05-01",
+          "success": true,
+          "count": 101,
+          "median_price": 638,
+          "average_price": 641,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-16T18:04:44.263970+00:00",
+          "date": "2026-05-16",
+          "success": true,
+          "count": 106,
+          "median_price": 627,
+          "average_price": 643,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-28T14:50:58.149713+00:00",
+          "date": "2026-05-28",
+          "success": true,
+          "count": 124,
+          "median_price": 625,
+          "average_price": 623,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-28T19:44:46.687003+00:00",
+          "date": "2026-05-28",
+          "success": true,
+          "count": 125,
+          "median_price": 600,
+          "average_price": 625,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-06-04T19:30:49.457690+00:00",
+          "date": "2026-06-04",
+          "success": true,
+          "count": 145,
+          "median_price": 650,
+          "average_price": 624,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-06-11T19:44:32.434876+00:00",
+          "date": "2026-06-11",
+          "success": true,
+          "count": 155,
+          "median_price": 637,
+          "average_price": 624,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-06-18T19:35:51.831982+00:00",
+          "date": "2026-06-18",
+          "success": true,
+          "count": 151,
+          "median_price": 650,
+          "average_price": 640,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-06-25T19:17:16.278079+00:00",
+          "date": "2026-06-25",
+          "success": true,
+          "count": 149,
+          "median_price": 650,
+          "average_price": 633,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-07-02T18:46:25.570769+00:00",
+          "date": "2026-07-02",
+          "success": true,
+          "count": 141,
+          "median_price": 625,
+          "average_price": 620,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -433,24 +665,32 @@
       "property_type": "T2/T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_1000&price=min-1000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A04%3A40.693455Z",
       "kpis": {
-        "latest_count": 66,
-        "latest_date": "2026-03-28",
+        "latest_count": 82,
+        "latest_date": "2026-07-02",
         "delta_7d": {
-          "delta": 0,
-          "from": 66,
-          "to": 66
+          "delta": -8,
+          "from": 90,
+          "to": 82
         },
         "delta_30d": {
-          "delta": 0,
-          "from": 66,
-          "to": 66
+          "delta": -2,
+          "from": 84,
+          "to": 82
         },
-        "latest_median_price": null,
-        "latest_average_price": null,
-        "price_sample_size": null,
-        "price_delta_30d": null,
-        "success_rate_30d": null,
-        "last_failure": null
+        "latest_median_price": 910,
+        "latest_average_price": 906,
+        "price_sample_size": 30,
+        "price_delta_30d": {
+          "delta": 38,
+          "from": 872,
+          "to": 910
+        },
+        "success_rate_30d": 0.5,
+        "last_failure": {
+          "date": "2026-06-25",
+          "category": "no_data",
+          "message": "No listings count found in content."
+        }
       },
       "timeseries": [
         {
@@ -584,6 +824,222 @@
           "provider": "historical_import",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:48:14.120326+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 84,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:51:54.989551+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 84,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:00:56.880177+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 84,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:01:35.042949+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 84,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:05:36.820797+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 84,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T17:45:25.019044+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 82,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T06:29:48.489905+00:00",
+          "date": "2026-04-28",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-04-28T06:46:27.401776+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 83,
+          "median_price": 865,
+          "average_price": 865,
+          "price_sample_size": 32,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T07:22:55.088473+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 83,
+          "median_price": 870,
+          "average_price": 865,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-01T18:10:14.429574+00:00",
+          "date": "2026-05-01",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-05-16T18:04:50.810562+00:00",
+          "date": "2026-05-16",
+          "success": true,
+          "count": 84,
+          "median_price": 872,
+          "average_price": 860,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-28T14:51:07.304763+00:00",
+          "date": "2026-05-28",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-05-28T19:44:51.771758+00:00",
+          "date": "2026-05-28",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-06-04T19:30:57.257000+00:00",
+          "date": "2026-06-04",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-06-11T19:44:38.066419+00:00",
+          "date": "2026-06-11",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-06-18T19:36:29.950467+00:00",
+          "date": "2026-06-18",
+          "success": true,
+          "count": 90,
+          "median_price": 895,
+          "average_price": 890,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-06-25T19:17:22.094731+00:00",
+          "date": "2026-06-25",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-07-02T18:46:29.910509+00:00",
+          "date": "2026-07-02",
+          "success": true,
+          "count": 82,
+          "median_price": 910,
+          "average_price": 906,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -594,24 +1050,32 @@
       "property_type": "T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1+t3+OR+f3+OR+%223+pi%C3%A8ces%22+OR+%222+chambres%22&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A07%3A02.056977Z",
       "kpis": {
-        "latest_count": 39,
-        "latest_date": "2026-03-28",
+        "latest_count": 37,
+        "latest_date": "2026-07-02",
         "delta_7d": {
           "delta": 0,
-          "from": 39,
-          "to": 39
+          "from": 37,
+          "to": 37
         },
         "delta_30d": {
-          "delta": 0,
-          "from": 39,
-          "to": 39
+          "delta": -15,
+          "from": 52,
+          "to": 37
         },
-        "latest_median_price": null,
-        "latest_average_price": null,
-        "price_sample_size": null,
-        "price_delta_30d": null,
-        "success_rate_30d": null,
-        "last_failure": null
+        "latest_median_price": 1128,
+        "latest_average_price": 1188,
+        "price_sample_size": 30,
+        "price_delta_30d": {
+          "delta": -2,
+          "from": 1130,
+          "to": 1128
+        },
+        "success_rate_30d": 0.75,
+        "last_failure": {
+          "date": "2026-06-11",
+          "category": "no_data",
+          "message": "No listings count found in content."
+        }
       },
       "timeseries": [
         {
@@ -973,18 +1437,463 @@
           "provider": "historical_import",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:48:15.715421+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 45,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T05:51:55.906905+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 45,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:00:59.746967+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 45,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:01:37.794862+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 45,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T06:05:41.827819+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 45,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-27T17:45:26.616566+00:00",
+          "date": "2026-04-27",
+          "success": true,
+          "count": 44,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "direct_http",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T06:30:02.631003+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 44,
+          "median_price": 1305,
+          "average_price": 1305,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T06:46:43.299189+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 44,
+          "median_price": 1305,
+          "average_price": 1305,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-04-28T07:23:09.705834+00:00",
+          "date": "2026-04-28",
+          "success": true,
+          "count": 44,
+          "median_price": 1204,
+          "average_price": 1305,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-01T18:10:28.206743+00:00",
+          "date": "2026-05-01",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-05-16T18:05:06.509069+00:00",
+          "date": "2026-05-16",
+          "success": true,
+          "count": 46,
+          "median_price": 1195,
+          "average_price": 1212,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-28T14:51:20.319882+00:00",
+          "date": "2026-05-28",
+          "success": true,
+          "count": 52,
+          "median_price": 1130,
+          "average_price": 1147,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-05-28T19:45:04.341817+00:00",
+          "date": "2026-05-28",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-06-04T19:31:09.830907+00:00",
+          "date": "2026-06-04",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-06-11T19:44:52.909822+00:00",
+          "date": "2026-06-11",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "no_data",
+          "error_message": "No listings count found in content."
+        },
+        {
+          "observed_at": "2026-06-18T19:37:27.244820+00:00",
+          "date": "2026-06-18",
+          "success": true,
+          "count": 44,
+          "median_price": 1130,
+          "average_price": 1213,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-06-25T19:18:06.833635+00:00",
+          "date": "2026-06-25",
+          "success": true,
+          "count": 37,
+          "median_price": 1185,
+          "average_price": 1223,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
+        },
+        {
+          "observed_at": "2026-07-02T18:46:45.129925+00:00",
+          "date": "2026-07-02",
+          "success": true,
+          "count": 37,
+          "median_price": 1128,
+          "average_price": 1188,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     }
   ],
-  "runs": [],
+  "runs": [
+    {
+      "run_id": "de6e7168ae4e",
+      "provider": "success",
+      "started_at": "9",
+      "status": "2026-04-27T05:51:57.858056+00:00",
+      "finished_at": "2026-04-27T05:51:53.803899+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "3ef078403ac5",
+      "provider": "success",
+      "started_at": "8",
+      "status": "2026-04-27T05:48:18.167994+00:00",
+      "finished_at": "2026-04-27T05:48:13.088865+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "10f356bb3ba8",
+      "provider": "partial",
+      "started_at": "7",
+      "status": "2026-04-27T05:45:16.284373+00:00",
+      "error_message": "Playwright: compteur introuvable dans le contenu rendu.; Playwright: compteur introuvable dans le contenu rendu.",
+      "finished_at": "2026-04-27T05:44:57.694093+00:00",
+      "category": "no_data",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "77731cfbd171",
+      "provider": "success",
+      "started_at": "6",
+      "status": "2026-04-27T05:30:14.704860+00:00",
+      "finished_at": "2026-04-27T05:30:12.942900+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "6a1b076626d6",
+      "provider": "success",
+      "started_at": "5",
+      "status": "2026-04-27T05:29:47.853595+00:00",
+      "finished_at": "2026-04-27T05:29:46.781766+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "134d8fc0b21c",
+      "provider": "success",
+      "started_at": "4",
+      "status": "2026-04-27T05:29:32.452121+00:00",
+      "finished_at": "2026-04-27T05:29:30.911858+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "3fc74445eb38",
+      "provider": "success",
+      "started_at": "3",
+      "status": "2026-04-27T05:22:51.817241+00:00",
+      "finished_at": "2026-04-27T05:22:48.871906+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "2c9e4e0ad2e6",
+      "provider": "firecrawl",
+      "started_at": "2026-07-02T18:46:24.429292+00:00",
+      "status": "success",
+      "finished_at": "2026-07-02T18:46:59.822862+00:00",
+      "category": "none",
+      "duration_seconds": 35
+    },
+    {
+      "run_id": "228b4b35adfb",
+      "provider": "firecrawl",
+      "started_at": "2026-06-25T19:17:15.733804+00:00",
+      "status": "partial",
+      "finished_at": "2026-06-25T19:18:23.962416+00:00",
+      "category": "none",
+      "duration_seconds": 68
+    },
+    {
+      "run_id": "557715f28012",
+      "provider": "firecrawl",
+      "started_at": "2026-06-18T19:35:50.730595+00:00",
+      "status": "success",
+      "finished_at": "2026-06-18T19:38:22.329705+00:00",
+      "category": "none",
+      "duration_seconds": 152
+    },
+    {
+      "run_id": "0be8a9204d57",
+      "provider": "firecrawl",
+      "started_at": "2026-06-11T19:44:32.100958+00:00",
+      "status": "partial",
+      "finished_at": "2026-06-11T19:45:04.335171+00:00",
+      "category": "none",
+      "duration_seconds": 32
+    },
+    {
+      "run_id": "f29cf2ec9db9",
+      "provider": "firecrawl",
+      "started_at": "2026-06-04T19:30:49.193639+00:00",
+      "status": "partial",
+      "finished_at": "2026-06-04T19:31:28.290504+00:00",
+      "category": "none",
+      "duration_seconds": 39
+    },
+    {
+      "run_id": "350806661581",
+      "provider": "firecrawl",
+      "started_at": "2026-05-28T19:44:45.555154+00:00",
+      "status": "partial",
+      "finished_at": "2026-05-28T19:45:16.666164+00:00",
+      "category": "none",
+      "duration_seconds": 31
+    },
+    {
+      "run_id": "4ef7ab1cc8f5",
+      "provider": "firecrawl",
+      "started_at": "2026-05-28T14:50:57.635837+00:00",
+      "status": "partial",
+      "finished_at": "2026-05-28T14:51:31.822212+00:00",
+      "category": "none",
+      "duration_seconds": 34
+    },
+    {
+      "run_id": "4586ffa805c3",
+      "provider": "firecrawl",
+      "started_at": "2026-05-16T18:04:43.247341+00:00",
+      "status": "success",
+      "finished_at": "2026-05-16T18:05:22.305129+00:00",
+      "category": "none",
+      "duration_seconds": 39
+    },
+    {
+      "run_id": "7df2110e96fe",
+      "provider": "firecrawl",
+      "started_at": "2026-05-01T18:10:08.931834+00:00",
+      "status": "partial",
+      "finished_at": "2026-05-01T18:11:25.241532+00:00",
+      "category": "none",
+      "duration_seconds": 76
+    },
+    {
+      "run_id": "a7cef6ef7321",
+      "provider": "firecrawl",
+      "started_at": "2026-04-28T07:22:52.438521+00:00",
+      "status": "success",
+      "finished_at": "2026-04-28T07:23:18.258569+00:00",
+      "category": "none",
+      "duration_seconds": 26
+    },
+    {
+      "run_id": "d53312f1018e",
+      "provider": "firecrawl",
+      "started_at": "2026-04-28T06:46:23.043376+00:00",
+      "status": "success",
+      "finished_at": "2026-04-28T06:46:48.477860+00:00",
+      "category": "none",
+      "duration_seconds": 25
+    },
+    {
+      "run_id": "7198cdd3251b",
+      "provider": "firecrawl",
+      "started_at": "2026-04-28T06:29:39.643751+00:00",
+      "status": "partial",
+      "finished_at": "2026-04-28T06:30:22.722537+00:00",
+      "category": "none",
+      "duration_seconds": 43
+    },
+    {
+      "run_id": "0adb5f3c3bdc",
+      "provider": "success",
+      "started_at": "2",
+      "status": "2026-04-27T05:22:25.925704+00:00",
+      "finished_at": "2026-04-27T05:22:21.276051+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "c1c39a81c612",
+      "provider": "success",
+      "started_at": "13",
+      "status": "2026-04-27T17:45:29.178732+00:00",
+      "finished_at": "2026-04-27T17:45:22.096840+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "69054779d6a9",
+      "provider": "success",
+      "started_at": "12",
+      "status": "2026-04-27T06:05:42.655550+00:00",
+      "finished_at": "2026-04-27T06:05:35.851249+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "28dee7f23da6",
+      "provider": "success",
+      "started_at": "11",
+      "status": "2026-04-27T06:01:39.873881+00:00",
+      "finished_at": "2026-04-27T06:01:33.858883+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "2749ab49d6bf",
+      "provider": "success",
+      "started_at": "10",
+      "status": "2026-04-27T06:01:01.570576+00:00",
+      "finished_at": "2026-04-27T06:00:55.863378+00:00",
+      "category": "none",
+      "duration_seconds": null
+    },
+    {
+      "run_id": "7e7de998f9d5",
+      "provider": "success",
+      "started_at": "1",
+      "status": "2026-04-27T05:10:57.770276+00:00",
+      "finished_at": "2026-04-27T05:10:54.872921+00:00",
+      "category": "none",
+      "duration_seconds": null
+    }
+  ],
   "health": {
-    "success_rate_7d": null,
-    "success_rate_30d": null,
-    "category_counts_30d": {},
-    "last_success_at": null,
-    "stale_days": null,
+    "success_rate_7d": 1.0,
+    "success_rate_30d": 0.5,
+    "category_counts_30d": {
+      "none": 4
+    },
+    "last_success_at": "2026-07-02T18:46:24.429292+00:00",
+    "stale_days": 5,
     "is_stale": false,
-    "total_runs": 0
+    "total_runs": 25
   }
 }

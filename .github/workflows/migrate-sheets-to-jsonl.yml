@@ -1,23 +1,22 @@
-name: Collect tension974
+name: Migrate Google Sheets history to data/*.jsonl
 
+# One-off bridge for the GitHub Pages migration: pulls the historical
+# observations/runs that used to live in Google Sheets into the repo as
+# JSONL, so no data is lost when the Google Sheets storage backend is
+# retired. Safe to re-run (it overwrites data/*.jsonl from the sheet, it
+# does not touch the sheet itself) but only needed once.
 on:
-  schedule:
-    # Chaque jeudi a 17h15 UTC (21h15 a La Reunion)
-    - cron: "15 17 * * 4"
   workflow_dispatch:
 
-concurrency:
-  group: tension974-collect
-  cancel-in-progress: false
-
 jobs:
-  collect:
+  migrate:
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     env:
-      FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
 
     steps:
       - name: Checkout
@@ -31,18 +30,15 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install gspread google-auth pyyaml python-dotenv
 
-      - name: Run tests
-        run: pytest
-
-      - name: Collect into data/*.jsonl
-        run: python -m tension974.collect --storage jsonl --firecrawl
+      - name: Migrate Google Sheets to data/*.jsonl
+        run: python scripts/migrate_sheets_to_jsonl.py
 
       - name: Build GitHub Pages dashboard data
         run: python scripts/build_site_data.py
 
-      - name: Commit and push updated data
+      - name: Commit and push migrated data
         run: |
           git config user.name "tension974-bot"
           git config user.email "tension974-bot@users.noreply.github.com"
@@ -50,6 +46,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No data changes to commit."
           else
-            git commit -m "chore: collecte automatique $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "chore: migrate historical data from Google Sheets to jsonl"
             git push origin HEAD:${{ github.ref_name }}
           fi

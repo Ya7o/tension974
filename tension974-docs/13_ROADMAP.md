@@ -35,6 +35,19 @@
 - Suivi durée de vie des annonces.
 - Indicateur composite de tension locative.
 
+## V2 — Réalisé : GitHub Pages + stockage git-natif
+
+- Dashboard basculé de Streamlit Cloud vers un site statique GitHub Pages
+  (`docs/`), sans serveur à maintenir.
+- Stockage basculé de Google Sheets vers `data/*.jsonl` versionné dans le
+  dépôt (`JsonlStorage`), avec migration ponctuelle de l'historique Sheets.
+- Suivi des prix moyens et médians par typologie, avec bascule dans le
+  dashboard.
+- Catégorisation des échecs de collecte (bloqué / limite de débit / délai /
+  réseau / page changée) et frise de santé des collectes 7j/30j.
+- Voir DECISION-009 à 011 dans `12_DECISION_LOG.md` et la section V2 de
+  `06_DASHBOARD_SPEC.md`.
+
 ## V3
 
 - Aide à la décision d'investissement.

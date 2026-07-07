@@ -6,22 +6,21 @@ from .logging_config import setup_logging
 from .providers.firecrawl_provider import FirecrawlProvider
 from .providers.simple_http_provider import SimpleHttpProvider
 from .settings import (
+    get_data_dir,
     get_database_path,
     get_firecrawl_api_key,
-    get_google_service_account_json,
-    get_google_sheet_id,
     get_log_file,
     get_log_level,
     get_searches_config_path,
 )
-from .storage import GoogleSheetsStorage, SQLiteStorage, StorageError
+from .storage import JsonlStorage, SQLiteStorage, StorageError
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Collecte tension974")
     parser.add_argument(
         "--storage",
-        choices=("sqlite", "google_sheets"),
+        choices=("sqlite", "jsonl"),
         default="sqlite",
         help="Backend de stockage.",
     )
@@ -71,11 +70,8 @@ def main(argv: list[str] | None = None) -> int:
 def _build_storage(name: str):
     if name == "sqlite":
         return SQLiteStorage(get_database_path())
-    if name == "google_sheets":
-        return GoogleSheetsStorage(
-            get_google_service_account_json(),
-            get_google_sheet_id(),
-        )
+    if name == "jsonl":
+        return JsonlStorage(get_data_dir())
     raise StorageError(f"Storage inconnu: {name}")
 
 

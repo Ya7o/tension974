@@ -3,10 +3,20 @@ from dataclasses import dataclass
 from statistics import median
 
 
+# Le nombre est soit compact ("242"), soit en groupes de milliers séparés par
+# une espace, insécable ou fine ("1 234"). Surtout pas de \s libre dans le
+# nombre : l'ancien motif avalait tout chiffre voisin à travers les retours à
+# la ligne ("Loyer 670\n12 annonces" devenait 67012). Le lookbehind refuse un
+# chiffre collé devant, le lookahead écarte les widgets du type
+# "1 annonce sauvegardée" qui précèdent le vrai compteur.
 _PATTERN = re.compile(
-    r"(\d[\d\s ]*)\s*annonce",
+    r"(?<![\d.,€])(\d{1,3}(?:[   ]\d{3})+|\d+)\s*annonces?\b"
+    r"(?!\s*(?:sauvegard|enregistr|consult|vue))",
     re.IGNORECASE,
 )
+# Nos recherches sont à l'échelle d'une ville : quelques dizaines à quelques
+# centaines d'annonces. Au-delà, c'est un artefact de parsing, pas un compteur.
+_MAX_PLAUSIBLE_COUNT = 50_000
 _MAX_PRICE_SAMPLE_SIZE = 30
 
 _PRICE_PATTERN = re.compile(
@@ -24,6 +34,17 @@ class PriceStats:
     max_price: int
 
 
+def find_count_match(text: str) -> re.Match | None:
+    """Return the first plausible "<N> annonces" match in the page text."""
+    if not text:
+        return None
+    for match in _PATTERN.finditer(text):
+        value = _parse_count(match.group(1))
+        if value is not None and value <= _MAX_PLAUSIBLE_COUNT:
+            return match
+    return None
+
+
 def extract_total_listings_count(text: str) -> int | None:
     """Extract total listings count from Leboncoin page text.
 
@@ -36,13 +57,14 @@ def extract_total_listings_count(text: str) -> int | None:
     if re.search(r"aucune\s+annonce", text, re.IGNORECASE):
         return 0
 
-    match = _PATTERN.search(text)
+    match = find_count_match(text)
     if not match:
         return None
+    return _parse_count(match.group(1))
 
-    raw = match.group(1)
-    # Remove all whitespace and non-breaking spaces used as thousands separators
-    digits = re.sub(r"[\s ]", "", raw)
+
+def _parse_count(raw: str) -> int | None:
+    digits = re.sub(r"[\s  ]", "", raw)
     try:
         return int(digits)
     except ValueError:

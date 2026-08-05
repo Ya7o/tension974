@@ -130,9 +130,24 @@ def test_collect_without_count_keeps_served_page(tmp_db, monkeypatch):
     assert provider.calls == 2
     assert obs.status == "failed"
     assert obs.total_listings_count is None
-    assert obs.error_message == "No listings count found in content."
+    # The DataDome interstitial must surface as an anti-bot block, not as a
+    # generic "page changed" failure — the dashboard colors depend on it.
+    assert "anti-bot" in (obs.error_message or "")
     assert obs.raw_total_listings_text == ANTIBOT_PAGE
     assert obs.credits_used == 10
+
+
+def test_collect_page_without_count_and_without_antibot_signature(tmp_db, monkeypatch):
+    """A really changed page (no anti-bot marker) keeps the no_data message."""
+    monkeypatch.setattr("tension974.collector.time.sleep", lambda seconds: None)
+    provider = SequenceProvider([
+        FetchResult(success=True, content="Une page inattendue sans compteur.", provider="fake"),
+    ])
+
+    obs = collect_one(SEARCH, provider, tmp_db)
+
+    assert obs.status == "failed"
+    assert obs.error_message == "No listings count found in content."
 
 
 def test_collect_does_not_retry_a_valid_page(tmp_db):

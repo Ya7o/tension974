@@ -19,6 +19,22 @@ def test_extract(text, expected):
     assert extract_total_listings_count(text) == expected
 
 
+@pytest.mark.parametrize("text,expected", [
+    # Régressions : l'ancien motif avalait tout chiffre voisin à travers les
+    # retours à la ligne et fabriquait des compteurs fantaisistes (67012).
+    ("Loyer 670\n12 annonces", 12),
+    ("Prix\n1200\n\n12 annonces", 12),
+    ("Studio 650 € charges comprises\n110 annonces", 110),
+    # Un widget "annonce sauvegardée" ne doit pas masquer le vrai compteur.
+    ("1 annonce sauvegardée\n\nLeboncoin\n242 annonces", 242),
+    ("3 annonces vues récemment\n88 annonces", 88),
+    # Plafond de vraisemblance : un nombre absurde est un artefact, pas un compteur.
+    ("999999999 annonces", None),
+])
+def test_extract_regressions(text, expected):
+    assert extract_total_listings_count(text) == expected
+
+
 def test_extract_listing_prices():
     text = """
     242 annonces

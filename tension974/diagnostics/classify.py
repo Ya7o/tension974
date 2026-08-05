@@ -31,7 +31,8 @@ _LABELS = {
 _PATTERNS: list[tuple[str, re.Pattern]] = [
     (CATEGORY_BLOCKED, re.compile(
         r"datadome|captcha|forbidden|access denied|cloudflare|"
-        r"\b403\b|blocked|bot detection|akamai|perimeterx",
+        r"\b403\b|blocked|bot detection|akamai|perimeterx|"
+        r"anti[- ]?bot|enable js|ad blocker",
         re.IGNORECASE,
     )),
     (CATEGORY_RATE_LIMITED, re.compile(r"\b429\b|rate limit|too many requests", re.IGNORECASE)),

@@ -1,16 +1,25 @@
 import logging
+import re
 import time
 import yaml
 from datetime import datetime, timezone
 
 from .models import FetchResult, Observation, SearchConfig
-from .extraction import extract_price_stats, extract_total_listings_count
+from .extraction import extract_price_stats, extract_total_listings_count, find_count_match
 from .providers.base import FetchProvider
 from .storage import SQLiteStorage, Storage
 
 logger = logging.getLogger("tension974.collector")
 _MAX_FETCH_ATTEMPTS = 2
 _RETRY_DELAY_SECONDS = 5
+
+# Interstitiel DataDome et parents : la page servie demande d'activer JS ou de
+# couper le bloqueur de pub. La distinguer d'un vrai changement de page permet
+# au dashboard d'afficher "Bloqué (anti-bot)" plutôt que "Page changée".
+_ANTIBOT_SIGNATURE = re.compile(
+    r"enable\s+js|ad\s*blocker|datadome|captcha|access\s+denied",
+    re.IGNORECASE,
+)
 
 
 def load_searches(config_path: str) -> list[SearchConfig]:
@@ -106,13 +115,18 @@ def _fetch_with_retry(search: SearchConfig, provider: FetchProvider) -> FetchRes
         # count is a failed fetch, and these blocks are intermittent enough
         # that the retry below usually clears them.
         if result.success and extract_total_listings_count(result.content) is None:
+            blocked = bool(result.content) and bool(_ANTIBOT_SIGNATURE.search(result.content))
             result = FetchResult(
                 success=False,
                 content=result.content,
                 content_type=result.content_type,
                 provider=result.provider,
                 status_code=result.status_code,
-                error_message="No listings count found in content.",
+                error_message=(
+                    "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
+                    if blocked
+                    else "No listings count found in content."
+                ),
                 credits_used=result.credits_used,
                 raw_metadata=result.raw_metadata,
             )
@@ -151,8 +165,7 @@ def collect_one(search: SearchConfig, provider: FetchProvider, db_path: str) -> 
 
 
 def _find_raw_text(content: str) -> str | None:
-    import re
-    m = re.search(r"(\d[\d\s ]*\s*annonce[s]?)", content, re.IGNORECASE)
+    m = find_count_match(content)
     return m.group(0) if m else None
 
 

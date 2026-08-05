@@ -16,6 +16,13 @@ def test_blocked_detection():
     assert categorize_error("Request blocked by Cloudflare") == "blocked"
 
 
+def test_antibot_challenge_is_blocked_not_no_data():
+    """La page DataDome « enable JS / ad blocker » est un blocage anti-bot."""
+    assert categorize_error(
+        "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
+    ) == "blocked"
+
+
 def test_rate_limited_detection():
     assert categorize_error("429 Too Many Requests") == "rate_limited"
 

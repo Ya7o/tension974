@@ -64,7 +64,42 @@ def main(argv: list[str] | None = None) -> int:
         else:
             print(f"[FAIL] {obs.search_id}: {obs.error_message}")
 
+    if args.firecrawl:
+        _report_credits(provider, logger)
+
+    # Une collecte intégralement en échec doit faire échouer le job appelant
+    # (collect.yml) au lieu de le laisser vert : les observations d'échec sont
+    # déjà écrites dans le stockage, rien n'est perdu, mais le signal remonte.
+    failures = [o for o in results if o.status != "success"]
+    if results and len(failures) == len(results):
+        print("ERROR: toutes les recherches ont échoué.", file=sys.stderr)
+        logger.error("Toutes les recherches ont échoué (%d/%d).", len(failures), len(results))
+        return 1
+
     return 0
+
+
+# ~15-30 crédits consommés par semaine (retry compris) : en dessous de ce
+# seuil, il reste moins d'un mois de collecte.
+_LOW_CREDITS_THRESHOLD = 120
+
+
+def _report_credits(provider, logger) -> None:
+    credits = provider.get_account_credits()
+    remaining = credits.get("remaining_credits") if isinstance(credits, dict) else None
+    if remaining is None:
+        logger.warning(
+            "Solde de crédits Firecrawl indisponible : %s",
+            credits.get("error", "réponse inattendue") if isinstance(credits, dict) else credits,
+        )
+        return
+    print(f"[CREDITS] {remaining} crédit(s) Firecrawl restant(s)")
+    if remaining < _LOW_CREDITS_THRESHOLD:
+        logger.warning(
+            "Solde Firecrawl bas : %s crédits restants (seuil %s) — moins d'un mois de collecte.",
+            remaining,
+            _LOW_CREDITS_THRESHOLD,
+        )
 
 
 def _build_storage(name: str):

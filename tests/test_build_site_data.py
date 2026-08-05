@@ -78,5 +78,7 @@ def test_build_writes_dashboard_json(tmp_path):
     assert dashboard_json.exists()
     on_disk = json.loads(dashboard_json.read_text(encoding="utf-8"))
     assert on_disk["searches"][0]["id"] == "studio_saint_denis"
-    assert (site_dir / "data" / "observations.jsonl").exists()
-    assert (site_dir / "data" / "runs.jsonl").exists()
+    # Les JSONL bruts ne sont plus dupliqués dans docs/data/ : ils vivent une
+    # seule fois dans data/, le dashboard pointe vers GitHub pour le téléchargement.
+    assert not (site_dir / "data" / "observations.jsonl").exists()
+    assert not (site_dir / "data" / "runs.jsonl").exists()

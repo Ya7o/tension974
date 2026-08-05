@@ -10,6 +10,11 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 
+# Dumps de diagnostic scraping : pages HTML tierces + cookies anti-bot,
+# à ne jamais committer (le workflow les publie en artefact CI).
+debug/
+diag/
+
 *.sqlite
 *.db
 data/*.db

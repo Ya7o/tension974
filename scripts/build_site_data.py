@@ -2,12 +2,12 @@
 """Build the static JSON consumed by the GitHub Pages dashboard (docs/data/).
 
 Reads the git-tracked JSONL data (data/observations.jsonl, data/runs.jsonl)
-and config/searches.yaml, aggregates them, and writes:
-  - docs/data/dashboard.json  (everything the dashboard needs to render)
-  - docs/data/observations.jsonl / runs.jsonl  (raw data, copied for download)
+and config/searches.yaml, aggregates them, and writes
+docs/data/dashboard.json — everything the dashboard needs to render. The raw
+JSONL files are not copied here: they live once, in data/, and the dashboard
+links to them on GitHub.
 """
 import json
-import shutil
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -62,11 +62,6 @@ def build(data_dir: Path, config_path: str, site_dir: Path) -> dict:
     (site_data_dir / "dashboard.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
-
-    for name in ("observations.jsonl", "runs.jsonl"):
-        source = data_dir / name
-        if source.exists():
-            shutil.copyfile(source, site_data_dir / name)
 
     return payload
 

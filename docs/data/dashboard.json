@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-07-30T18:43:03.150568+00:00",
+  "generated_at": "2026-08-05T18:02:52.886550+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -16,16 +16,16 @@
           "to": 110
         },
         "delta_30d": {
-          "delta": -39,
-          "from": 149,
+          "delta": -31,
+          "from": 141,
           "to": 110
         },
         "latest_median_price": 670,
         "latest_average_price": 646,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 20,
-          "from": 650,
+          "delta": 45,
+          "from": 625,
           "to": 670
         },
         "success_rate_30d": 1.0,
@@ -715,25 +715,21 @@
       "kpis": {
         "latest_count": 86,
         "latest_date": "2026-07-23",
-        "delta_7d": {
-          "delta": 0,
-          "from": 86,
-          "to": 86
-        },
+        "delta_7d": null,
         "delta_30d": {
-          "delta": -4,
-          "from": 90,
+          "delta": 4,
+          "from": 82,
           "to": 86
         },
         "latest_median_price": 898,
         "latest_average_price": 891,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 3,
-          "from": 895,
+          "delta": -12,
+          "from": 910,
           "to": 898
         },
-        "success_rate_30d": 0.8,
+        "success_rate_30d": 0.75,
         "last_failure": {
           "date": "2026-07-30",
           "category": "no_data",
@@ -1162,8 +1158,8 @@
         "latest_average_price": 1242,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 15,
-          "from": 1185,
+          "delta": 72,
+          "from": 1128,
           "to": 1200
         },
         "success_rate_30d": 1.0,
@@ -1803,70 +1799,6 @@
   ],
   "runs": [
     {
-      "run_id": "de6e7168ae4e",
-      "provider": "success",
-      "started_at": "9",
-      "status": "2026-04-27T05:51:57.858056+00:00",
-      "finished_at": "2026-04-27T05:51:53.803899+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
-      "run_id": "3ef078403ac5",
-      "provider": "success",
-      "started_at": "8",
-      "status": "2026-04-27T05:48:18.167994+00:00",
-      "finished_at": "2026-04-27T05:48:13.088865+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
-      "run_id": "10f356bb3ba8",
-      "provider": "partial",
-      "started_at": "7",
-      "status": "2026-04-27T05:45:16.284373+00:00",
-      "error_message": "Playwright: compteur introuvable dans le contenu rendu.; Playwright: compteur introuvable dans le contenu rendu.",
-      "finished_at": "2026-04-27T05:44:57.694093+00:00",
-      "category": "no_data",
-      "duration_seconds": null
-    },
-    {
-      "run_id": "77731cfbd171",
-      "provider": "success",
-      "started_at": "6",
-      "status": "2026-04-27T05:30:14.704860+00:00",
-      "finished_at": "2026-04-27T05:30:12.942900+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
-      "run_id": "6a1b076626d6",
-      "provider": "success",
-      "started_at": "5",
-      "status": "2026-04-27T05:29:47.853595+00:00",
-      "finished_at": "2026-04-27T05:29:46.781766+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
-      "run_id": "134d8fc0b21c",
-      "provider": "success",
-      "started_at": "4",
-      "status": "2026-04-27T05:29:32.452121+00:00",
-      "finished_at": "2026-04-27T05:29:30.911858+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
-      "run_id": "3fc74445eb38",
-      "provider": "success",
-      "started_at": "3",
-      "status": "2026-04-27T05:22:51.817241+00:00",
-      "finished_at": "2026-04-27T05:22:48.871906+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
       "run_id": "4b96d53697ed",
       "provider": "firecrawl",
       "started_at": "2026-07-30T18:42:04.089903+00:00",
@@ -2012,69 +1944,121 @@
       "duration_seconds": 43
     },
     {
-      "run_id": "0adb5f3c3bdc",
-      "provider": "success",
-      "started_at": "2",
-      "status": "2026-04-27T05:22:25.925704+00:00",
-      "finished_at": "2026-04-27T05:22:21.276051+00:00",
-      "category": "none",
-      "duration_seconds": null
-    },
-    {
       "run_id": "c1c39a81c612",
-      "provider": "success",
-      "started_at": "13",
-      "status": "2026-04-27T17:45:29.178732+00:00",
-      "finished_at": "2026-04-27T17:45:22.096840+00:00",
+      "started_at": "2026-04-27T17:45:22.096840+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T17:45:29.178732+00:00",
       "category": "none",
-      "duration_seconds": null
+      "duration_seconds": 7
     },
     {
       "run_id": "69054779d6a9",
-      "provider": "success",
-      "started_at": "12",
-      "status": "2026-04-27T06:05:42.655550+00:00",
-      "finished_at": "2026-04-27T06:05:35.851249+00:00",
+      "started_at": "2026-04-27T06:05:35.851249+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T06:05:42.655550+00:00",
       "category": "none",
-      "duration_seconds": null
+      "duration_seconds": 7
     },
     {
       "run_id": "28dee7f23da6",
-      "provider": "success",
-      "started_at": "11",
-      "status": "2026-04-27T06:01:39.873881+00:00",
-      "finished_at": "2026-04-27T06:01:33.858883+00:00",
+      "started_at": "2026-04-27T06:01:33.858883+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T06:01:39.873881+00:00",
       "category": "none",
-      "duration_seconds": null
+      "duration_seconds": 6
     },
     {
       "run_id": "2749ab49d6bf",
-      "provider": "success",
-      "started_at": "10",
-      "status": "2026-04-27T06:01:01.570576+00:00",
-      "finished_at": "2026-04-27T06:00:55.863378+00:00",
+      "started_at": "2026-04-27T06:00:55.863378+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T06:01:01.570576+00:00",
       "category": "none",
-      "duration_seconds": null
+      "duration_seconds": 6
+    },
+    {
+      "run_id": "de6e7168ae4e",
+      "started_at": "2026-04-27T05:51:53.803899+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:51:57.858056+00:00",
+      "category": "none",
+      "duration_seconds": 4
+    },
+    {
+      "run_id": "3ef078403ac5",
+      "started_at": "2026-04-27T05:48:13.088865+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:48:18.167994+00:00",
+      "category": "none",
+      "duration_seconds": 5
+    },
+    {
+      "run_id": "10f356bb3ba8",
+      "started_at": "2026-04-27T05:44:57.694093+00:00",
+      "status": "partial",
+      "error_message": "Playwright: compteur introuvable dans le contenu rendu.; Playwright: compteur introuvable dans le contenu rendu.",
+      "finished_at": "2026-04-27T05:45:16.284373+00:00",
+      "category": "no_data",
+      "duration_seconds": 19
+    },
+    {
+      "run_id": "77731cfbd171",
+      "started_at": "2026-04-27T05:30:12.942900+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:30:14.704860+00:00",
+      "category": "none",
+      "duration_seconds": 2
+    },
+    {
+      "run_id": "6a1b076626d6",
+      "started_at": "2026-04-27T05:29:46.781766+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:29:47.853595+00:00",
+      "category": "none",
+      "duration_seconds": 1
+    },
+    {
+      "run_id": "134d8fc0b21c",
+      "started_at": "2026-04-27T05:29:30.911858+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:29:32.452121+00:00",
+      "category": "none",
+      "duration_seconds": 2
+    },
+    {
+      "run_id": "3fc74445eb38",
+      "started_at": "2026-04-27T05:22:48.871906+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:22:51.817241+00:00",
+      "category": "none",
+      "duration_seconds": 3
+    },
+    {
+      "run_id": "0adb5f3c3bdc",
+      "started_at": "2026-04-27T05:22:21.276051+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:22:25.925704+00:00",
+      "category": "none",
+      "duration_seconds": 5
     },
     {
       "run_id": "7e7de998f9d5",
-      "provider": "success",
-      "started_at": "1",
-      "status": "2026-04-27T05:10:57.770276+00:00",
-      "finished_at": "2026-04-27T05:10:54.872921+00:00",
+      "started_at": "2026-04-27T05:10:54.872921+00:00",
+      "status": "success",
+      "finished_at": "2026-04-27T05:10:57.770276+00:00",
       "category": "none",
-      "duration_seconds": null
+      "duration_seconds": 3
     }
   ],
   "health": {
     "success_rate_7d": 0.0,
-    "success_rate_30d": 0.8,
+    "success_rate_30d": 0.75,
     "category_counts_30d": {
       "no_data": 1,
-      "none": 4
+      "none": 3
     },
     "last_success_at": "2026-07-23T18:21:55.291485+00:00",
-    "stale_days": 7,
+    "last_finished_status": "partial",
+    "stale_days": 5,
     "is_stale": false,
     "total_runs": 29
   }

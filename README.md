@@ -31,9 +31,11 @@ deployment → Source : Deploy from a branch**, puis choisir la branche
 `main` et le dossier **`/docs`**. Le dashboard est ensuite disponible à
 `https://<owner>.github.io/tension974/`.
 
-Le workflow `collect.yml` pousse des commits automatiquement : dans
-**Settings → Actions → General → Workflow permissions**, choisir
-**Read and write permissions**.
+Le workflow `collect.yml` pousse des commits automatiquement : il déclare
+lui-même `permissions: contents: write`, donc le réglage global du dépôt
+(**Settings → Actions → General → Workflow permissions**) peut rester sur
+**Read repository contents** — inutile d'accorder l'écriture à tous les
+workflows.
 
 ## Installation locale
 
@@ -84,13 +86,13 @@ l'onglet Actions.
 ## Migration depuis Google Sheets (historique)
 
 Le projet utilisait auparavant Google Sheets comme stockage et Streamlit
-Cloud comme dashboard. Si un Google Sheet contient encore de l'historique
-utile, lance une fois le workflow `Migrate Google Sheets history to
-data/*.jsonl` (onglet Actions → workflow_dispatch) : il lit le Sheet via les
-secrets `GOOGLE_SERVICE_ACCOUNT_JSON` / `GOOGLE_SHEET_ID` déjà configurés et
-réécrit `data/observations.jsonl` / `data/runs.jsonl`. Voir
-`tension974-docs/12_DECISION_LOG.md` (DECISION-009 à 011) pour le détail de
-cette migration et les raisons du changement d'architecture.
+Cloud comme dashboard. La migration a été faite en juillet 2026 ; le
+workflow qui la réalisait a été retiré car un déclenchement accidentel
+aurait écrasé `data/*.jsonl` avec un Sheet qui ne reçoit plus rien (le
+script `scripts/migrate_sheets_to_jsonl.py` reste dans le dépôt à titre de
+référence). Voir `tension974-docs/12_DECISION_LOG.md` (DECISION-009 à 011)
+pour le détail de cette migration et les raisons du changement
+d'architecture.
 
 ## Structure
 

@@ -1,89 +1,424 @@
 /* tension974 dashboard — wires data/dashboard.json to the chart components
  * defined in charts.js. Plain JS, no build step, no framework.
+ *
+ * Reading order on screen mirrors the questions actually asked when the page
+ * is opened on a phone: is the data fresh, did the market move, where does
+ * each typology stand. Everything below that is on demand.
  */
 "use strict";
 
 const SERIES_COLORS = ["var(--series-1)", "var(--series-2)", "var(--series-3)"];
-let currentRangeDays = null; // null = all time
+const THEME_KEY = "t974-theme";
+const STALE_AFTER_DAYS = 10;
+const FLAT_PCT = 3; // below this, a move is noise, not a trend
+const MIN_HISTORY_FOR_LEVEL = 8;
+
+let currentRangeDays = 365; // "12 mois" by default; null = tout l'historique
 let currentPriceMetric = "median_price";
 let DASHBOARD = null;
+let RUNS = [];
+let HEALTH = null;
 
-function deltaBadge(delta, goodDirection) {
-  // goodDirection: "up" means an increase is good (fewer people competing
-  // for listings), "down" means an increase is bad (rising rents).
-  if (!delta) return { text: "Données insuffisantes", cls: "flat" };
-  const value = delta.delta;
-  const sign = value > 0 ? "+" : "";
-  const isGood = goodDirection === "up" ? value >= 0 : value <= 0;
-  const cls = value === 0 ? "flat" : (isGood ? "good" : "bad");
-  return { text: `${sign}${formatCompact(value)}`, cls };
+/* ── Statistics ─────────────────────────────────────────────────────────
+ * All of it derived client-side from data already present in
+ * dashboard.json — no new collected field, no backend change.
+ */
+
+function quantile(sortedValues, q) {
+  if (sortedValues.length === 0) return null;
+  const pos = (sortedValues.length - 1) * q;
+  const lower = Math.floor(pos);
+  const upper = Math.ceil(pos);
+  if (lower === upper) return sortedValues[lower];
+  return sortedValues[lower] + (sortedValues[upper] - sortedValues[lower]) * (pos - lower);
 }
 
-function buildKpiCard(search, index) {
-  const card = document.createElement("div");
-  card.className = "card";
-  const kpis = search.kpis;
-  const color = SERIES_COLORS[index % SERIES_COLORS.length];
+/** Share of the history at or below `value`, ties counted half. */
+function percentileRank(values, value) {
+  if (values.length === 0) return null;
+  let below = 0;
+  let equal = 0;
+  values.forEach((v) => {
+    if (v < value) below += 1;
+    else if (v === value) equal += 1;
+  });
+  return (below + equal / 2) / values.length;
+}
 
-  const label = document.createElement("div");
-  label.className = "kpi-label";
-  label.style.color = color;
-  label.textContent = search.name;
-  card.appendChild(label);
+const LEVELS = {
+  tight: { key: "tight", label: "Tendu", hint: "offre rare" },
+  normal: { key: "normal", label: "Normal", hint: "offre habituelle" },
+  loose: { key: "loose", label: "Détendu", hint: "offre abondante" },
+};
 
-  const sub = document.createElement("div");
-  sub.className = "kpi-sub";
-  sub.textContent = kpis.latest_date ? `Relevé du ${formatDateFull(kpis.latest_date)}` : "Aucun relevé";
-  card.appendChild(sub);
+/**
+ * Reads the latest listing count against the typology's own 12-month
+ * distribution. Few listings = tight market, many listings = loose market
+ * (see tension974-docs/01_PRODUCT_SPEC.md). Returns null when the history is
+ * too short to say anything honest.
+ */
+function tensionLevel(series, now = Date.now()) {
+  const cutoff = now - 365 * 86400000;
+  const window = series.filter((p) =>
+    p.success && p.count !== null && p.count !== undefined
+    && new Date(p.observed_at).getTime() >= cutoff);
+  if (window.length < MIN_HISTORY_FOR_LEVEL) return null;
 
-  const value = document.createElement("div");
-  value.className = "kpi-value";
-  value.textContent = kpis.latest_count !== null && kpis.latest_count !== undefined ? formatCompact(kpis.latest_count) : "—";
-  card.appendChild(value);
+  const values = window.map((p) => p.count).sort((a, b) => a - b);
+  const latest = window[window.length - 1].count;
+  const rank = percentileRank(values, latest);
 
-  const d7 = deltaBadge(kpis.delta_7d, "up");
-  const d30 = deltaBadge(kpis.delta_30d, "up");
-  const deltaRow = document.createElement("div");
-  deltaRow.style.display = "flex";
-  deltaRow.style.gap = "14px";
+  let level = LEVELS.normal;
+  if (rank <= 0.33) level = LEVELS.tight;
+  else if (rank >= 0.66) level = LEVELS.loose;
 
-  const d7el = document.createElement("span");
-  d7el.className = `kpi-delta ${d7.cls}`;
-  d7el.textContent = `7j : ${d7.text}`;
-  const d30el = document.createElement("span");
-  d30el.className = `kpi-delta ${d30.cls}`;
-  d30el.textContent = `30j : ${d30.text}`;
-  deltaRow.appendChild(d7el);
-  deltaRow.appendChild(d30el);
-  card.appendChild(deltaRow);
+  return {
+    ...level,
+    rank,
+    latest,
+    median: Math.round(quantile(values, 0.5)),
+    band: { lo: quantile(values, 0.25), hi: quantile(values, 0.75) },
+    sampleSize: window.length,
+  };
+}
 
-  if (kpis.latest_median_price !== null && kpis.latest_median_price !== undefined) {
-    const priceBlock = document.createElement("div");
-    priceBlock.className = "kpi-price";
-    const priceDelta = deltaBadge(kpis.price_delta_30d, "down");
-    const strongMedian = document.createElement("strong");
-    strongMedian.textContent = `${formatCompact(kpis.latest_median_price)} €`;
-    priceBlock.append("Prix médian : ", strongMedian);
-    if (kpis.latest_average_price) {
-      priceBlock.append(` (moyen ${formatCompact(kpis.latest_average_price)} €)`);
-    }
-    const priceDeltaEl = document.createElement("span");
-    priceDeltaEl.className = `kpi-delta ${priceDelta.cls}`;
-    priceDeltaEl.style.marginLeft = "8px";
-    priceDeltaEl.textContent = `30j : ${priceDelta.text}`;
-    priceBlock.appendChild(priceDeltaEl);
-    card.appendChild(priceBlock);
+/** Turns a {delta, from, to} block from dashboard.json into a % move. */
+function trendFromDelta(delta) {
+  if (!delta) return null;
+  const absolute = delta.to - delta.from;
+  const pct = delta.from ? (absolute / delta.from) * 100 : null;
+  let direction = "flat";
+  if (pct === null) direction = absolute > 0 ? "up" : (absolute < 0 ? "down" : "flat");
+  else if (pct >= FLAT_PCT) direction = "up";
+  else if (pct <= -FLAT_PCT) direction = "down";
+  return { pct, absolute, direction };
+}
+
+const ARROWS = { up: "↑", down: "↓", flat: "→" };
+
+function trendChip(trend, { noun, neutral = false } = {}) {
+  const span = document.createElement("span");
+  span.className = `trend ${neutral ? "is-neutral" : `is-${trend ? trend.direction : "flat"}`}`;
+  if (!trend) {
+    span.classList.add("is-unknown");
+    span.textContent = "pas de comparaison";
+    return span;
+  }
+  const value = trend.pct === null ? formatCompact(trend.absolute) : formatPercent(trend.pct);
+  span.textContent = `${ARROWS[trend.direction]} ${value}${noun ? ` ${noun}` : ""}`;
+  return span;
+}
+
+/* ── Collection health ──────────────────────────────────────────────────
+ * 13 rows migrated from Google Sheets have shifted columns (started_at holds
+ * a row index), and because merge_runs sorts started_at as a string they land
+ * at the head of runs[] and render as the most recent ticks. We drop anything
+ * whose started_at is not a real ISO timestamp and recompute the displayed
+ * rates on what remains, rather than showing a health figure we know is wrong.
+ */
+
+function isIsoTimestamp(value) {
+  return typeof value === "string"
+    && /^\d{4}-\d{2}-\d{2}T/.test(value)
+    && !Number.isNaN(new Date(value).getTime());
+}
+
+function usableRuns(runs) {
+  return (runs || [])
+    .filter((run) => isIsoTimestamp(run.started_at))
+    .sort((a, b) => new Date(b.started_at) - new Date(a.started_at));
+}
+
+function computeHealth(runs, now = Date.now()) {
+  const within = (days) => runs.filter((r) => new Date(r.started_at).getTime() >= now - days * 86400000);
+  const rate = (subset) => {
+    const finished = subset.filter((r) => ["success", "partial", "failed"].includes(r.status));
+    if (finished.length === 0) return null;
+    return finished.filter((r) => r.status === "success").length / finished.length;
+  };
+
+  const runs30d = within(30);
+  const categoryCounts = {};
+  runs30d.forEach((run) => {
+    categoryCounts[run.category] = (categoryCounts[run.category] || 0) + 1;
+  });
+
+  const lastSuccess = runs.find((r) => r.status === "success") || null;
+  const lastFinished = runs.find((r) => ["success", "partial", "failed"].includes(r.status)) || null;
+  // Staleness is about the data on screen, so it counts from the last run that
+  // actually produced readings — a partial run still refreshed most typologies.
+  const lastProductive = runs.find((r) => ["success", "partial"].includes(r.status)) || null;
+  const staleDays = lastProductive
+    ? Math.floor((now - new Date(lastProductive.started_at).getTime()) / 86400000)
+    : null;
+
+  return {
+    successRate7d: rate(within(7)),
+    successRate30d: rate(runs30d),
+    categoryCounts30d: categoryCounts,
+    lastSuccessAt: lastSuccess ? lastSuccess.started_at : null,
+    lastFinished,
+    staleDays,
+    isStale: staleDays === null || staleDays >= STALE_AFTER_DAYS,
+    totalRuns: runs.length,
+    droppedRuns: (DASHBOARD ? DASHBOARD.runs.length : 0) - runs.length,
+  };
+}
+
+/* ── Status bar ─────────────────────────────────────────────────────────── */
+
+function latestReadingDate() {
+  const dates = DASHBOARD.searches
+    .map((s) => s.kpis.latest_date)
+    .filter(Boolean)
+    .sort();
+  return dates.length ? dates[dates.length - 1] : null;
+}
+
+function renderStatusPill() {
+  const pill = document.getElementById("status-pill");
+  const label = document.getElementById("status-pill-text");
+  pill.classList.remove("is-good", "is-warning", "is-critical", "is-unknown");
+
+  const reading = latestReadingDate();
+  const readingText = reading ? `relevé du ${formatDateShort(reading)}` : "aucun relevé";
+
+  let tone = "is-good";
+  let text = `Collecte à jour · ${readingText}`;
+
+  if (HEALTH.totalRuns === 0) {
+    tone = "is-unknown";
+    text = `État de collecte inconnu · ${readingText}`;
+  } else if (HEALTH.staleDays === null) {
+    tone = "is-critical";
+    text = `Aucune collecte exploitable · ${readingText}`;
+  } else if (HEALTH.isStale) {
+    tone = "is-critical";
+    text = `Collecte en retard de ${HEALTH.staleDays} j · ${readingText}`;
+  } else if (HEALTH.lastFinished && HEALTH.lastFinished.status === "failed") {
+    tone = "is-critical";
+    text = `Dernière collecte en échec · ${readingText}`;
+  } else if (HEALTH.lastFinished && HEALTH.lastFinished.status === "partial") {
+    tone = "is-warning";
+    text = `Dernière collecte partielle · ${readingText}`;
   }
 
-  if (kpis.last_failure) {
-    const errBlock = document.createElement("div");
-    errBlock.className = "kpi-error";
-    errBlock.textContent = `⚠ Dernier échec (${kpis.last_failure.date}) : ${CATEGORY_LABEL_FR[kpis.last_failure.category] || kpis.last_failure.category}`;
-    card.appendChild(errBlock);
+  pill.classList.add(tone);
+  label.textContent = text;
+}
+
+/* ── Verdict ────────────────────────────────────────────────────────────── */
+
+function joinFr(items) {
+  if (items.length === 0) return "";
+  if (items.length === 1) return items[0];
+  return `${items.slice(0, -1).join(", ")} et ${items[items.length - 1]}`;
+}
+
+function buildVerdict(readings) {
+  const known = readings.filter((r) => r.level);
+  const sentences = [];
+
+  if (known.length === 0) {
+    sentences.push({ lead: "Historique encore trop court", rest: " pour situer le marché — les relevés s'accumulent à chaque collecte." });
+  } else {
+    const tight = known.filter((r) => r.level.key === "tight").length;
+    const loose = known.filter((r) => r.level.key === "loose").length;
+    let lead = "Marché dans sa normale";
+    if (loose > tight && loose >= known.length / 2) lead = "Marché plutôt détendu";
+    else if (tight > loose && tight >= known.length / 2) lead = "Marché plutôt tendu";
+    else if (tight && loose) lead = "Signaux partagés";
+    sentences.push({ lead, rest: " par rapport aux 12 derniers mois." });
+  }
+
+  const up = readings.filter((r) => r.countTrend && r.countTrend.direction === "up").map((r) => r.shortName);
+  const down = readings.filter((r) => r.countTrend && r.countTrend.direction === "down").map((r) => r.shortName);
+  const flat = readings.filter((r) => r.countTrend && r.countTrend.direction === "flat").map((r) => r.shortName);
+
+  const clauses = [];
+  if (up.length) clauses.push(`progresse sur ${joinFr(up)}`);
+  if (down.length) clauses.push(`recule sur ${joinFr(down)}`);
+  if (flat.length) clauses.push(`reste stable sur ${joinFr(flat)}`);
+  if (clauses.length) {
+    sentences.push({ lead: "", rest: `Sur 4 semaines, l'offre ${joinFr(clauses)}.` });
+  }
+
+  const movers = readings
+    .filter((r) => r.priceTrend && r.priceTrend.direction !== "flat" && r.priceTrend.pct !== null)
+    .map((r) => `${r.shortName} ${formatPercent(r.priceTrend.pct)}`);
+  if (movers.length) {
+    sentences.push({ lead: "", rest: `Côté prix médians : ${joinFr(movers)}.` });
+  }
+
+  return sentences;
+}
+
+function renderVerdict(readings) {
+  const host = document.getElementById("verdict");
+  host.innerHTML = "";
+  buildVerdict(readings).forEach((sentence, i) => {
+    const p = document.createElement("p");
+    p.className = i === 0 ? "verdict-lead" : "verdict-detail";
+    if (sentence.lead) {
+      const strong = document.createElement("strong");
+      strong.textContent = sentence.lead;
+      p.appendChild(strong);
+    }
+    p.appendChild(document.createTextNode(sentence.rest));
+    host.appendChild(p);
+  });
+}
+
+/* ── Typology cards ─────────────────────────────────────────────────────── */
+
+function buildReading(search, index) {
+  const kpis = search.kpis;
+  return {
+    search,
+    index,
+    color: SERIES_COLORS[index % SERIES_COLORS.length],
+    shortName: search.property_type || search.name,
+    level: tensionLevel(search.timeseries),
+    countTrend: trendFromDelta(kpis.delta_30d),
+    countTrend7d: trendFromDelta(kpis.delta_7d),
+    priceTrend: trendFromDelta(kpis.price_delta_30d),
+  };
+}
+
+function metricValue(value, unit) {
+  const p = document.createElement("p");
+  p.className = "metric-value";
+  const strong = document.createElement("strong");
+  strong.textContent = value;
+  p.appendChild(strong);
+  p.appendChild(document.createTextNode(` ${unit}`));
+  return p;
+}
+
+function buildCard(reading, freshestDate) {
+  const { search, level, color } = reading;
+  const kpis = search.kpis;
+
+  const card = document.createElement("article");
+  card.className = "card typology-card";
+  card.style.setProperty("--accent", color);
+
+  // Header: typology + tension level, never colour alone.
+  const head = document.createElement("header");
+  head.className = "typology-head";
+  const name = document.createElement("h3");
+  name.textContent = search.name;
+  head.appendChild(name);
+
+  const chip = document.createElement("span");
+  chip.className = `level-chip ${level ? `is-${level.key}` : "is-unknown"}`;
+  chip.textContent = level ? level.label : "Historique court";
+  if (level) chip.title = `${level.hint} — ${Math.round(level.rank * 100)}ᵉ centile de ses 12 derniers mois`;
+  head.appendChild(chip);
+  card.appendChild(head);
+
+  // The two headline numbers side by side: offer volume (the tension signal)
+  // and price level (the positioning signal).
+  const metrics = document.createElement("div");
+  metrics.className = "metric-row";
+
+  const countBlock = document.createElement("div");
+  countBlock.className = "metric";
+  countBlock.appendChild(metricValue(
+    kpis.latest_count !== null && kpis.latest_count !== undefined ? formatCompact(kpis.latest_count) : "—",
+    "annonces",
+  ));
+  const countTrends = document.createElement("p");
+  countTrends.className = "metric-trends";
+  countTrends.appendChild(trendChip(reading.countTrend, { noun: "/ 4 sem." }));
+  if (reading.countTrend7d) {
+    const weekly = document.createElement("span");
+    weekly.className = "trend-secondary";
+    const value = reading.countTrend7d.pct === null
+      ? formatCompact(reading.countTrend7d.absolute)
+      : formatPercent(reading.countTrend7d.pct);
+    weekly.textContent = `${value} / 7 j`;
+    countTrends.appendChild(weekly);
+  }
+  countBlock.appendChild(countTrends);
+  metrics.appendChild(countBlock);
+
+  const priceBlock = document.createElement("div");
+  priceBlock.className = "metric";
+  if (kpis.latest_median_price !== null && kpis.latest_median_price !== undefined) {
+    priceBlock.appendChild(metricValue(`${formatCompact(kpis.latest_median_price)} €`, "médian"));
+    const priceTrends = document.createElement("p");
+    priceTrends.className = "metric-trends";
+    priceTrends.appendChild(trendChip(reading.priceTrend, { noun: "/ 4 sem.", neutral: true }));
+    // The headline price is a median of at most 30 prices read off page 1 of
+    // the results — say so next to it, not only inside the data table.
+    const note = document.createElement("span");
+    note.className = "trend-secondary";
+    const parts = [];
+    if (kpis.latest_average_price) parts.push(`moy. ${formatCompact(kpis.latest_average_price)} €`);
+    parts.push(kpis.price_sample_size ? `éch. ${formatCompact(kpis.price_sample_size)}` : "éch. ?");
+    note.textContent = parts.join(" · ");
+    priceTrends.appendChild(note);
+    priceBlock.appendChild(priceTrends);
+  } else {
+    priceBlock.appendChild(metricValue("—", "médian"));
+    const none = document.createElement("p");
+    none.className = "metric-note";
+    none.textContent = "prix pas encore relevés";
+    priceBlock.appendChild(none);
+  }
+  metrics.appendChild(priceBlock);
+  card.appendChild(metrics);
+
+  // Sparkline: the shape of the last 12 months, with the usual range behind it.
+  const spark = document.createElement("div");
+  spark.className = "spark";
+  card.appendChild(spark);
+  const sparkPoints = search.timeseries
+    .filter((p) => new Date(p.observed_at).getTime() >= Date.now() - 365 * 86400000)
+    .map((p) => ({ x: p.observed_at, y: p.success ? p.count : null }));
+  renderSparkline(spark, {
+    points: sparkPoints,
+    color,
+    band: level ? level.band : null,
+    height: 38,
+    ariaLabel: level
+      ? `${search.name} : ${formatCompact(level.latest)} annonces sur 12 mois, plage habituelle de ${formatCompact(Math.round(level.band.lo))} à ${formatCompact(Math.round(level.band.hi))}, médiane ${formatCompact(level.median)}.`
+      : `${search.name} : tendance du nombre d'annonces sur 12 mois.`,
+  });
+
+  if (level) {
+    const context = document.createElement("p");
+    context.className = "spark-caption";
+    context.textContent = `12 mois · habituel ${formatCompact(Math.round(level.band.lo))}–${formatCompact(Math.round(level.band.hi))} · médiane ${formatCompact(level.median)}`;
+    card.appendChild(context);
+  }
+
+  // Freshness: a typology lagging behind the others must not hide in grey 11px.
+  const isLagging = kpis.latest_date && freshestDate && kpis.latest_date < freshestDate;
+  const freshFailure = kpis.last_failure && kpis.last_failure.date === freshestDate
+    ? kpis.last_failure : null;
+  if (isLagging || freshFailure) {
+    const warn = document.createElement("p");
+    warn.className = "card-warning";
+    const cause = freshFailure
+      ? `${CATEGORY_LABEL_FR[freshFailure.category] || freshFailure.category}`.toLowerCase()
+      : null;
+    // formatDateShort already ends in a period ("30 juil."), so don't add one.
+    if (freshFailure && isLagging) {
+      warn.textContent = `Collecte du ${formatDateShort(freshFailure.date)} en échec (${cause}) : les chiffres datent du ${formatDateShort(kpis.latest_date)}`;
+    } else if (freshFailure) {
+      warn.textContent = `Collecte du ${formatDateShort(freshFailure.date)} en échec : ${cause}.`;
+    } else {
+      warn.textContent = `Chiffres du ${formatDateShort(kpis.latest_date)}, en retard sur les autres typologies.`;
+    }
+    card.appendChild(warn);
   }
 
   return card;
 }
+
+/* ── Detail: one chart per typology, each at its own scale ─────────────── */
 
 function filterByRange(points, dateKey) {
   if (currentRangeDays === null) return points;
@@ -91,19 +426,66 @@ function filterByRange(points, dateKey) {
   return points.filter((p) => new Date(p[dateKey]).getTime() >= cutoff);
 }
 
-function renderCountChart() {
-  const series = DASHBOARD.searches.map((search, i) => ({
-    id: search.id,
-    label: search.name,
-    shortLabel: search.property_type || search.name,
-    color: SERIES_COLORS[i % SERIES_COLORS.length],
-    points: filterByRange(search.timeseries, "observed_at")
-      .map((p) => ({ x: p.observed_at, y: p.success ? p.count : null })),
-  }));
-  renderLineChart(document.getElementById("count-chart"), series, { formatValue: (v) => `${formatCompact(v)} annonces` });
+function renderSmallMultiples(host, readings, { field, formatValue, unit, zeroBased = true, trimLeadingEmpty = false }) {
+  host.innerHTML = "";
+  readings.forEach((reading) => {
+    const { search, color } = reading;
+    let points = filterByRange(search.timeseries, "observed_at")
+      .map((p) => ({
+        x: p.observed_at,
+        y: (p.success && p[field] !== null && p[field] !== undefined) ? p[field] : null,
+      }));
+    // Prices only started being collected in April 2026: without this, a
+    // 12-month view is nine months of empty axis and three months of curve.
+    if (trimLeadingEmpty) {
+      const first = points.findIndex((p) => p.y !== null);
+      points = first > 0 ? points.slice(first) : points;
+    }
+
+    const block = document.createElement("div");
+    block.className = "multiple";
+
+    const caption = document.createElement("p");
+    caption.className = "multiple-title";
+    const dot = document.createElement("span");
+    dot.className = "multiple-dot";
+    dot.style.background = color;
+    caption.appendChild(dot);
+    caption.appendChild(document.createTextNode(search.name));
+    block.appendChild(caption);
+
+    const chart = document.createElement("div");
+    chart.className = "multiple-chart";
+    block.appendChild(chart);
+    host.appendChild(block);
+
+    renderLineChart(chart, [{
+      id: search.id,
+      label: search.name,
+      shortLabel: reading.shortName,
+      color,
+      points,
+    }], {
+      formatValue,
+      directLabels: false,
+      showLegend: false,
+      zeroBased,
+      height: 150,
+      ariaLabel: `${search.name} — ${unit} sur la période sélectionnée.`,
+      emptyMessage: `Aucun relevé de ${unit} sur cette période.`,
+    });
+  });
+}
+
+function renderCountDetail(readings) {
+  renderSmallMultiples(document.getElementById("count-charts"), readings, {
+    field: "count",
+    formatValue: (v) => `${formatCompact(v)} annonces`,
+    unit: "nombre d'annonces",
+  });
 
   const rows = [];
-  DASHBOARD.searches.forEach((search) => {
+  readings.forEach(({ search }) => {
     filterByRange(search.timeseries, "observed_at").forEach((p) => {
       if (p.success) rows.push({ date: p.date, name: search.name, count: p.count, provider: p.provider });
     });
@@ -117,20 +499,18 @@ function renderCountChart() {
   ], rows);
 }
 
-function renderPriceChart() {
+function renderPriceDetail(readings) {
   const metric = currentPriceMetric;
-  const series = DASHBOARD.searches.map((search, i) => ({
-    id: search.id,
-    label: search.name,
-    shortLabel: search.property_type || search.name,
-    color: SERIES_COLORS[i % SERIES_COLORS.length],
-    points: filterByRange(search.timeseries, "observed_at")
-      .map((p) => ({ x: p.observed_at, y: (p.success && p[metric] !== null && p[metric] !== undefined) ? p[metric] : null })),
-  }));
-  renderLineChart(document.getElementById("price-chart"), series, { formatValue: (v) => `${formatCompact(v)} €` });
+  renderSmallMultiples(document.getElementById("price-charts"), readings, {
+    field: metric,
+    formatValue: (v) => `${formatCompact(v)} €`,
+    unit: "prix",
+    zeroBased: false,
+    trimLeadingEmpty: true,
+  });
 
   const rows = [];
-  DASHBOARD.searches.forEach((search) => {
+  readings.forEach(({ search }) => {
     filterByRange(search.timeseries, "observed_at").forEach((p) => {
       if (p.success && p[metric] !== null && p[metric] !== undefined) {
         rows.push({ date: p.date, name: search.name, price: p[metric], sample: p.price_sample_size });
@@ -146,9 +526,22 @@ function renderPriceChart() {
   ], rows);
 }
 
-function renderRuns() {
-  const runs = filterByRange(DASHBOARD.runs, "started_at");
-  renderRunStrip(document.getElementById("run-strip"), runs);
+function renderPriceCoverageNote() {
+  const note = document.getElementById("price-coverage");
+  const firstPriced = DASHBOARD.searches
+    .flatMap((s) => s.timeseries)
+    .filter((p) => p.median_price !== null && p.median_price !== undefined)
+    .map((p) => p.date)
+    .sort()[0];
+  note.textContent = firstPriced
+    ? `Les prix ne sont relevés que depuis le ${formatDateFull(firstPriced)} : les courbes commencent à cette date. L'axe vertical ne part pas de zéro, pour laisser voir les variations.`
+    : "Aucun prix relevé pour le moment.";
+}
+
+/* ── Detail: collection health, folded away behind the status pill ─────── */
+
+function renderCollectionDetail() {
+  renderRunStrip(document.getElementById("run-strip"), RUNS);
 
   renderTable(document.getElementById("run-table"), [
     { label: "Début", key: "started_at", format: (r) => formatDateTimeFull(r.started_at) },
@@ -156,12 +549,11 @@ function renderRuns() {
     { label: "Provider", key: "provider", format: (r) => r.provider || "—" },
     { label: "Durée", format: (r) => (r.duration_seconds ? `${r.duration_seconds}s` : "—") },
     { label: "Erreur", format: (r) => r.error_message || "—" },
-  ], runs);
+  ], RUNS);
 
   const legend = document.getElementById("category-legend");
   legend.innerHTML = "";
-  const counts = DASHBOARD.health.category_counts_30d || {};
-  Object.entries(counts).forEach(([category, count]) => {
+  Object.entries(HEALTH.categoryCounts30d).forEach(([category, count]) => {
     const item = document.createElement("span");
     item.className = "item";
     const swatch = document.createElement("span");
@@ -174,16 +566,15 @@ function renderRuns() {
     legend.appendChild(item);
   });
 
-  const health = DASHBOARD.health;
   const statsEl = document.getElementById("health-stats");
   statsEl.innerHTML = "";
-  const stats = [
-    ["Taux de succès 7j", health.success_rate_7d !== null ? `${Math.round(health.success_rate_7d * 100)}%` : "—"],
-    ["Taux de succès 30j", health.success_rate_30d !== null ? `${Math.round(health.success_rate_30d * 100)}%` : "—"],
-    ["Collectes enregistrées", health.total_runs],
-    ["Dernier succès", health.last_success_at ? formatDateFull(health.last_success_at) : "—"],
-  ];
-  stats.forEach(([label, num]) => {
+  const asPercent = (rate) => (rate === null ? "—" : `${Math.round(rate * 100)}%`);
+  [
+    ["Succès sur 7 j", asPercent(HEALTH.successRate7d)],
+    ["Succès sur 30 j", asPercent(HEALTH.successRate30d)],
+    ["Collectes exploitables", formatCompact(HEALTH.totalRuns)],
+    ["Dernier succès", HEALTH.lastSuccessAt ? formatDateFull(HEALTH.lastSuccessAt) : "—"],
+  ].forEach(([label, num]) => {
     const div = document.createElement("div");
     div.className = "health-stat";
     const numEl = document.createElement("div");
@@ -196,73 +587,124 @@ function renderRuns() {
     div.appendChild(labelEl);
     statsEl.appendChild(div);
   });
+
+  const dropped = document.getElementById("runs-dropped");
+  if (HEALTH.droppedRuns > 0) {
+    dropped.textContent = `${HEALTH.droppedRuns} enregistrement(s) hérités de la migration Google Sheets ont un horodatage invalide et sont exclus de ces chiffres.`;
+    dropped.hidden = false;
+  } else {
+    dropped.hidden = true;
+  }
 }
 
-function renderAll() {
-  renderCountChart();
-  renderPriceChart();
-  renderRuns();
+/* ── Wiring ─────────────────────────────────────────────────────────────── */
+
+function renderDetail(readings) {
+  renderCountDetail(readings);
+  renderPriceDetail(readings);
 }
 
-function wireFilters() {
+function wireControls(readings) {
   document.querySelectorAll(".filter-btn").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("is-active"));
+      document.querySelectorAll(".filter-btn").forEach((b) => {
+        b.classList.remove("is-active");
+        b.setAttribute("aria-pressed", "false");
+      });
       btn.classList.add("is-active");
-      const range = btn.dataset.range;
-      currentRangeDays = range === "all" ? null : Number(range);
-      renderAll();
+      btn.setAttribute("aria-pressed", "true");
+      currentRangeDays = btn.dataset.range === "all" ? null : Number(btn.dataset.range);
+      renderDetail(readings);
     });
   });
 
   document.querySelectorAll(".price-toggle button").forEach((btn) => {
     btn.addEventListener("click", () => {
-      document.querySelectorAll(".price-toggle button").forEach((b) => b.classList.remove("is-active"));
+      document.querySelectorAll(".price-toggle button").forEach((b) => {
+        b.classList.remove("is-active");
+        b.setAttribute("aria-pressed", "false");
+      });
       btn.classList.add("is-active");
+      btn.setAttribute("aria-pressed", "true");
       currentPriceMetric = btn.dataset.priceMetric;
-      renderPriceChart();
+      renderPriceDetail(readings);
     });
   });
 
   document.querySelectorAll("[data-toggle]").forEach((btn) => {
     const key = btn.dataset.toggle;
-    const chartMap = { count: "count-chart", price: "price-chart", runs: "run-strip" };
-    const tableMap = { count: "count-table", price: "price-table", runs: "run-table" };
-    wireTableToggle(btn, document.getElementById(chartMap[key]), document.getElementById(tableMap[key]));
+    const charts = { count: "count-charts", price: "price-charts", runs: "run-strip" };
+    const tables = { count: "count-table", price: "price-table", runs: "run-table" };
+    wireTableToggle(btn, document.getElementById(charts[key]), document.getElementById(tables[key]));
+  });
+
+  // The status pill is the entry point to the collection details.
+  const pill = document.getElementById("status-pill");
+  const details = document.getElementById("collection-details");
+  pill.addEventListener("click", () => {
+    const open = details.open;
+    details.open = !open;
+    if (!open) details.scrollIntoView({ behavior: "smooth", block: "nearest" });
   });
 }
 
-function showStaleBanner(health) {
-  const banner = document.getElementById("stale-banner");
-  if (health.is_stale) {
-    banner.classList.add("is-visible");
-    document.getElementById("stale-banner-text").textContent =
-      `Aucune collecte réussie depuis ${health.stale_days} jour(s) — vérifie le workflow GitHub Actions "Collect tension974".`;
+function applyTheme(theme) {
+  if (theme === "light" || theme === "dark") {
+    document.documentElement.setAttribute("data-theme", theme);
+  } else {
+    document.documentElement.removeAttribute("data-theme");
   }
+  const btn = document.getElementById("theme-toggle");
+  if (!btn) return;
+  const isDark = theme === "dark"
+    || (!theme && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  btn.textContent = isDark ? "☀" : "☾";
+  btn.setAttribute("aria-label", isDark ? "Passer en thème clair" : "Passer en thème sombre");
+}
+
+function wireTheme() {
+  let stored = null;
+  try { stored = localStorage.getItem(THEME_KEY); } catch (err) { stored = null; }
+  applyTheme(stored);
+  const btn = document.getElementById("theme-toggle");
+  btn.addEventListener("click", () => {
+    const isDark = document.documentElement.getAttribute("data-theme") === "dark"
+      || (!document.documentElement.hasAttribute("data-theme")
+        && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const next = isDark ? "light" : "dark";
+    try { localStorage.setItem(THEME_KEY, next); } catch (err) { /* private mode */ }
+    applyTheme(next);
+  });
 }
 
 async function init() {
+  wireTheme();
   const appEl = document.getElementById("app");
+
   try {
     const res = await fetch("data/dashboard.json", { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     DASHBOARD = await res.json();
   } catch (err) {
     appEl.innerHTML = "";
-    const empty = emptyState("Impossible de charger data/dashboard.json.");
-    appEl.appendChild(empty);
+    appEl.appendChild(emptyState("Impossible de charger data/dashboard.json."));
     return;
   }
 
-  document.getElementById("last-updated").textContent =
-    `Mis à jour le ${formatDateTimeFull(DASHBOARD.generated_at)}`;
+  RUNS = usableRuns(DASHBOARD.runs);
+  HEALTH = computeHealth(RUNS);
+
+  // The collection state is worth knowing even when there is nothing to plot —
+  // "no data" and "the scraper is blocked" are different problems.
+  renderStatusPill();
+  document.getElementById("generated-at").textContent =
+    `Données générées le ${formatDateTimeFull(DASHBOARD.generated_at)}`;
 
   const hasAnyData = DASHBOARD.searches.some((s) => s.timeseries.length > 0);
   if (!hasAnyData) {
     appEl.innerHTML = "";
     const empty = document.createElement("div");
     empty.className = "empty-state";
-    empty.innerHTML = "";
     const p1 = document.createElement("p");
     p1.textContent = "Aucun relevé disponible pour le moment.";
     const p2 = document.createElement("p");
@@ -273,17 +715,20 @@ async function init() {
     return;
   }
 
-  showStaleBanner(DASHBOARD.health);
-
-  const template = document.getElementById("tpl-main");
   appEl.innerHTML = "";
-  appEl.appendChild(template.content.cloneNode(true));
+  appEl.appendChild(document.getElementById("tpl-main").content.cloneNode(true));
 
-  const kpiGrid = document.getElementById("kpi-grid");
-  DASHBOARD.searches.forEach((search, i) => kpiGrid.appendChild(buildKpiCard(search, i)));
+  const readings = DASHBOARD.searches.map(buildReading);
+  renderVerdict(readings);
 
-  wireFilters();
-  renderAll();
+  const freshest = latestReadingDate();
+  const grid = document.getElementById("card-grid");
+  readings.forEach((reading) => grid.appendChild(buildCard(reading, freshest)));
+
+  renderPriceCoverageNote();
+  renderDetail(readings);
+  renderCollectionDetail();
+  wireControls(readings);
 }
 
 init();

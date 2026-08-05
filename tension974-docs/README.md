@@ -46,6 +46,9 @@ L'agent doit :
 - `12_DECISION_LOG.md` : journal des décisions.
 - `13_ROADMAP.md` : évolutions futures.
 - `14_ACCEPTANCE_CHECKLIST.md` : checklist de livraison.
+- `15_UI_AUDIT_ET_PARCOURS.md` : audit de l'interface et parcours utilisateur
+  ayant motivé la refonte UI (spec de la vue résultante : section V3 de
+  `06_DASHBOARD_SPEC.md`).
 
 ## Important
 

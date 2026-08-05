@@ -100,3 +100,33 @@ mises à jour de prix qui dise *si* et *pourquoi* une collecte a échoué,
 plutôt qu'un simple statut réussi/échoué. Affiché dans le dashboard comme
 une frise colorée par run (`docs/assets/charts.js::renderRunStrip`) avec
 légende par catégorie et taux de succès 7j/30j.
+
+## DECISION-012 — Une page sans compteur est un échec de fetch réessayable
+
+L'anti-bot de Leboncoin (DataDome) répond en HTTP 200 avec une page de
+challenge dont le corps est `Please enable JS and disable any ad blocker`.
+Le fetch « réussissait » donc, et l'absence de compteur n'était détectée
+qu'en aval, dans `collect_one_with_storage`. Résultat : `_fetch_with_retry`
+n'était jamais sollicité sur ce cas, et la collecte était perdue après une
+seule tentative — 12 échecs sur 141 relevés, tous avec ce même message, dont
+T2/T3 le 30 juillet 2026 (`credits_used = 5`, soit un unique appel).
+
+Décision : `_fetch_with_retry` valide désormais le contenu. Une page qui ne
+contient aucun compteur est convertie en `FetchResult(success=False)`, ce qui
+déclenche la tentative de reprise existante (2 tentatives, 5 s d'écart). Le
+chemin d'échec est unifié : une seule branche écrit une observation `failed`,
+en conservant les 500 premiers caractères de la page servie comme unique
+élément de diagnostic.
+
+Coût : sur une collecte bloquée, la recherche concernée consomme 2 appels
+Firecrawl au lieu d'un (10 crédits au lieu de 5). Une page valide continue de
+coûter un seul appel — c'est verrouillé par
+`tests/test_collector_offline.py::test_collect_does_not_retry_a_valid_page`.
+
+Non tranché : les échecs se concentrent sur T2/T3 (36 % des tentatives
+réelles) et T3 (18 %), jamais sur Studio (0 % sur 23 tentatives). Deux
+explications se superposent exactement sans que les données permettent de les
+départager — le rang de la requête dans le run, et le paramètre
+`real_estate_type=2` présent dans ces deux URL seulement. L'écart de temps
+entre requêtes a été écarté : sa médiane est de 8 s aussi bien sur les
+tentatives réussies que sur les tentatives échouées.

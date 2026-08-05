@@ -48,29 +48,20 @@ def collect_one_with_storage(search: SearchConfig, provider: FetchProvider, stor
             status="failed",
             provider=fetch.provider,
             error_message=fetch.error_message,
+            # Keep the served page: on an anti-bot block it is the only clue
+            # ("Please enable JS and disable any ad blocker" = DataDome).
+            raw_total_listings_text=fetch.content[:500] if fetch.content else None,
             credits_used=fetch.credits_used,
         )
         storage.insert_observation(obs)
         logger.warning("Collection failed for %s: %s", search.id, fetch.error_message)
         return obs
 
+    # A successful fetch is now guaranteed to carry a count: _fetch_with_retry
+    # rejects any page without one, so there is a single failure path above.
     count = extract_total_listings_count(fetch.content)
     raw_text = _find_raw_text(fetch.content)
     price_stats = extract_price_stats(fetch.content)
-
-    if count is None:
-        obs = Observation(
-            search_id=search.id,
-            observed_at=observed_at,
-            status="failed",
-            provider=fetch.provider,
-            error_message="No listings count found in content.",
-            raw_total_listings_text=fetch.content[:500] if fetch.content else None,
-            credits_used=fetch.credits_used,
-        )
-        storage.insert_observation(obs)
-        logger.warning("Could not extract count for %s", search.id)
-        return obs
 
     obs = Observation(
         search_id=search.id,
@@ -108,6 +99,24 @@ def _fetch_with_retry(search: SearchConfig, provider: FetchProvider) -> FetchRes
         result = provider.fetch(search.url)
         if result.credits_used:
             total_credits += result.credits_used
+
+        # Leboncoin's anti-bot serves its challenge page with a 200, so the
+        # fetch "succeeds" while the body holds no listings count. Judging on
+        # transport alone let those runs through unretried; a page without a
+        # count is a failed fetch, and these blocks are intermittent enough
+        # that the retry below usually clears them.
+        if result.success and extract_total_listings_count(result.content) is None:
+            result = FetchResult(
+                success=False,
+                content=result.content,
+                content_type=result.content_type,
+                provider=result.provider,
+                status_code=result.status_code,
+                error_message="No listings count found in content.",
+                credits_used=result.credits_used,
+                raw_metadata=result.raw_metadata,
+            )
+
         if result.success:
             if total_credits:
                 result.credits_used = total_credits

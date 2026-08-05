@@ -94,6 +94,60 @@ def test_collect_provider_error(tmp_db):
     assert rows[0]["status"] == "failed"
 
 
+ANTIBOT_PAGE = "Please enable JS and disable any ad blocker"
+
+
+def test_collect_retries_when_page_has_no_count(tmp_db, monkeypatch):
+    """An anti-bot challenge arrives as a 200 with no count: retry it.
+
+    Leboncoin's DataDome page used to slip through unretried because the fetch
+    itself had succeeded — that is how the 30 July 2026 T2/T3 collection was
+    lost after a single attempt.
+    """
+    monkeypatch.setattr("tension974.collector.time.sleep", lambda seconds: None)
+    provider = SequenceProvider([
+        FetchResult(success=True, content=ANTIBOT_PAGE, provider="fake", credits_used=5),
+        FetchResult(success=True, content="Leboncoin\n\n242 annonces", provider="fake", credits_used=5),
+    ])
+
+    obs = collect_one(SEARCH, provider, tmp_db)
+
+    assert provider.calls == 2
+    assert obs.status == "success"
+    assert obs.total_listings_count == 242
+    assert obs.credits_used == 10
+
+
+def test_collect_without_count_keeps_served_page(tmp_db, monkeypatch):
+    """When every attempt is blocked, keep the page as the only diagnostic."""
+    monkeypatch.setattr("tension974.collector.time.sleep", lambda seconds: None)
+    provider = SequenceProvider([
+        FetchResult(success=True, content=ANTIBOT_PAGE, provider="fake", credits_used=5),
+    ])
+
+    obs = collect_one(SEARCH, provider, tmp_db)
+
+    assert provider.calls == 2
+    assert obs.status == "failed"
+    assert obs.total_listings_count is None
+    assert obs.error_message == "No listings count found in content."
+    assert obs.raw_total_listings_text == ANTIBOT_PAGE
+    assert obs.credits_used == 10
+
+
+def test_collect_does_not_retry_a_valid_page(tmp_db):
+    """A page carrying a count costs exactly one call — no wasted credits."""
+    provider = SequenceProvider([
+        FetchResult(success=True, content="Leboncoin\n\n242 annonces", provider="fake", credits_used=5),
+    ])
+
+    obs = collect_one(SEARCH, provider, tmp_db)
+
+    assert provider.calls == 1
+    assert obs.status == "success"
+    assert obs.credits_used == 5
+
+
 def test_collect_retries_once_then_succeeds(tmp_db, monkeypatch):
     monkeypatch.setattr("tension974.collector.time.sleep", lambda seconds: None)
     provider = SequenceProvider([

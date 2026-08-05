@@ -64,6 +64,15 @@ Si aucun compteur n'est trouvé :
 - conserver un extrait de contenu si possible ;
 - ne pas interrompre brutalement le programme.
 
+> **Mise à jour** : l'anti-bot de Leboncoin (DataDome) répond parfois en
+> HTTP 200 avec une page de challenge (`Please enable JS and disable any ad
+> blocker`) plutôt qu'un vrai 4xx — le fetch « réussit » sans qu'aucun
+> compteur ne soit présent. `tension974/collector.py::_fetch_with_retry`
+> traite donc désormais une page sans compteur comme un échec de fetch
+> réessayable (2 tentatives, 5 s d'écart), avant d'écrire l'observation
+> `failed` du Niveau 5 ci-dessus si les deux tentatives échouent. Voir
+> DECISION-012 dans `12_DECISION_LOG.md`.
+
 ## Extraction
 
 Créer une fonction pure testable :

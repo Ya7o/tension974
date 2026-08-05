@@ -9,7 +9,7 @@ from datetime import datetime, timedelta, timezone
 from statistics import mean
 from typing import Any
 
-from .diagnostics.classify import CATEGORY_NONE, categorize_error
+from .diagnostics.classify import CATEGORY_NONE, CATEGORY_UNKNOWN, categorize_error
 
 _STALE_AFTER_DAYS = 10
 
@@ -41,23 +41,34 @@ def merge_runs(run_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
     results = []
     for run_id in order:
         run = merged[run_id]
+        started = parse_iso(run.get("started_at"))
+        if started is None:
+            # Sans horodatage de départ exploitable, le run est implaçable sur
+            # la frise et fausserait les taux de santé — on l'écarte plutôt
+            # que de le publier (colonnes décalées de l'ancienne migration
+            # Google Sheets, par exemple).
+            continue
+
         status = run.get("status", "unknown")
         if status == "running":
             category = "running"
         elif status == "success":
             category = CATEGORY_NONE
-        else:
+        elif status in ("partial", "failed"):
             category = categorize_error(run.get("error_message"))
+        else:
+            category = CATEGORY_UNKNOWN
         run["category"] = category
 
-        started = parse_iso(run.get("started_at"))
         finished = parse_iso(run.get("finished_at"))
         run["duration_seconds"] = (
             round((finished - started).total_seconds()) if started and finished else None
         )
         results.append(run)
 
-    results.sort(key=lambda r: r.get("started_at") or "", reverse=True)
+    # Tri chronologique réel : le tri lexicographique faisait remonter les
+    # started_at non ISO en tête du JSON publié.
+    results.sort(key=lambda r: parse_iso(r["started_at"]), reverse=True)
     return results
 
 
@@ -90,7 +101,17 @@ def _value_delta(series: list[dict[str, Any]], field: str, days: int, now: datet
     if len(successful) < 2:
         return None
     cutoff = now - timedelta(days=days)
-    older = [p for p in successful if parse_iso(p["observed_at"]) and parse_iso(p["observed_at"]) <= cutoff]
+    # Le point de référence ne peut jamais être le dernier relevé lui-même :
+    # quand le dernier succès était plus vieux que la fenêtre, il se comparait
+    # à lui-même et le dashboard affichait un faux « 0 % ». Il doit aussi être
+    # assez récent (2× la fenêtre) pour que la comparaison garde son sens après
+    # un trou de collecte — sinon on n'affiche rien plutôt qu'un delta trompeur.
+    max_age = now - timedelta(days=days * 2)
+    older = []
+    for p in successful[:-1]:
+        dt = parse_iso(p["observed_at"])
+        if dt and max_age <= dt <= cutoff:
+            older.append(p)
     if not older:
         return None
     latest_value = successful[-1][field]
@@ -154,16 +175,22 @@ def compute_health(merged_runs: list[dict[str, Any]], now: datetime | None = Non
     for run in runs_30d:
         category_counts[run["category"]] = category_counts.get(run["category"], 0) + 1
 
+    finished_statuses = ("success", "partial", "failed")
     last_success = next((r for r in merged_runs if r.get("status") == "success"), None)
-    last_success_at = parse_iso(last_success["started_at"]) if last_success else None
-    stale_days = (now - last_success_at).days if last_success_at else None
+    last_finished = next((r for r in merged_runs if r.get("status") in finished_statuses), None)
+    # La fraîcheur se mesure au dernier run qui a réellement produit des
+    # relevés : un run partiel a quand même rafraîchi la plupart des typologies.
+    last_productive = next((r for r in merged_runs if r.get("status") in ("success", "partial")), None)
+    last_productive_at = parse_iso(last_productive["started_at"]) if last_productive else None
+    stale_days = (now - last_productive_at).days if last_productive_at else None
 
     return {
         "success_rate_7d": _rate(_within(7)),
         "success_rate_30d": _rate(runs_30d),
         "category_counts_30d": category_counts,
         "last_success_at": last_success["started_at"] if last_success else None,
+        "last_finished_status": last_finished["status"] if last_finished else None,
         "stale_days": stale_days,
-        "is_stale": stale_days is not None and stale_days >= _STALE_AFTER_DAYS,
+        "is_stale": stale_days is None or stale_days >= _STALE_AFTER_DAYS,
         "total_runs": len(merged_runs),
     }

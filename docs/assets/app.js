@@ -9,7 +9,6 @@
 
 const SERIES_COLORS = ["var(--series-1)", "var(--series-2)", "var(--series-3)"];
 const THEME_KEY = "t974-theme";
-const STALE_AFTER_DAYS = 10;
 const FLAT_PCT = 3; // below this, a move is noise, not a trend
 const MIN_HISTORY_FOR_LEVEL = 8;
 
@@ -110,58 +109,34 @@ function trendChip(trend, { noun, neutral = false } = {}) {
 }
 
 /* ── Collection health ──────────────────────────────────────────────────
- * 13 rows migrated from Google Sheets have shifted columns (started_at holds
- * a row index), and because merge_runs sorts started_at as a string they land
- * at the head of runs[] and render as the most recent ticks. We drop anything
- * whose started_at is not a real ISO timestamp and recompute the displayed
- * rates on what remains, rather than showing a health figure we know is wrong.
+ * Computed once, server-side, by tension974/aggregation.py (compute_health)
+ * and published in dashboard.json — a single implementation instead of a
+ * Python/JS pair that had already drifted apart. This adapter only maps the
+ * snake_case payload to the names used below.
  */
 
-function isIsoTimestamp(value) {
-  return typeof value === "string"
-    && /^\d{4}-\d{2}-\d{2}T/.test(value)
-    && !Number.isNaN(new Date(value).getTime());
-}
-
-function usableRuns(runs) {
-  return (runs || [])
-    .filter((run) => isIsoTimestamp(run.started_at))
-    .sort((a, b) => new Date(b.started_at) - new Date(a.started_at));
-}
-
-function computeHealth(runs, now = Date.now()) {
-  const within = (days) => runs.filter((r) => new Date(r.started_at).getTime() >= now - days * 86400000);
-  const rate = (subset) => {
-    const finished = subset.filter((r) => ["success", "partial", "failed"].includes(r.status));
-    if (finished.length === 0) return null;
-    return finished.filter((r) => r.status === "success").length / finished.length;
-  };
-
-  const runs30d = within(30);
-  const categoryCounts = {};
-  runs30d.forEach((run) => {
-    categoryCounts[run.category] = (categoryCounts[run.category] || 0) + 1;
-  });
-
-  const lastSuccess = runs.find((r) => r.status === "success") || null;
-  const lastFinished = runs.find((r) => ["success", "partial", "failed"].includes(r.status)) || null;
-  // Staleness is about the data on screen, so it counts from the last run that
-  // actually produced readings — a partial run still refreshed most typologies.
-  const lastProductive = runs.find((r) => ["success", "partial"].includes(r.status)) || null;
-  const staleDays = lastProductive
-    ? Math.floor((now - new Date(lastProductive.started_at).getTime()) / 86400000)
-    : null;
-
+function healthFromPayload(h) {
+  if (!h) {
+    return {
+      successRate7d: null,
+      successRate30d: null,
+      categoryCounts30d: {},
+      lastSuccessAt: null,
+      lastFinishedStatus: null,
+      staleDays: null,
+      isStale: true,
+      totalRuns: 0,
+    };
+  }
   return {
-    successRate7d: rate(within(7)),
-    successRate30d: rate(runs30d),
-    categoryCounts30d: categoryCounts,
-    lastSuccessAt: lastSuccess ? lastSuccess.started_at : null,
-    lastFinished,
-    staleDays,
-    isStale: staleDays === null || staleDays >= STALE_AFTER_DAYS,
-    totalRuns: runs.length,
-    droppedRuns: (DASHBOARD ? DASHBOARD.runs.length : 0) - runs.length,
+    successRate7d: h.success_rate_7d,
+    successRate30d: h.success_rate_30d,
+    categoryCounts30d: h.category_counts_30d || {},
+    lastSuccessAt: h.last_success_at,
+    lastFinishedStatus: h.last_finished_status,
+    staleDays: h.stale_days,
+    isStale: h.is_stale,
+    totalRuns: h.total_runs,
   };
 }
 
@@ -195,10 +170,10 @@ function renderStatusPill() {
   } else if (HEALTH.isStale) {
     tone = "is-critical";
     text = `Collecte en retard de ${HEALTH.staleDays} j · ${readingText}`;
-  } else if (HEALTH.lastFinished && HEALTH.lastFinished.status === "failed") {
+  } else if (HEALTH.lastFinishedStatus === "failed") {
     tone = "is-critical";
     text = `Dernière collecte en échec · ${readingText}`;
-  } else if (HEALTH.lastFinished && HEALTH.lastFinished.status === "partial") {
+  } else if (HEALTH.lastFinishedStatus === "partial") {
     tone = "is-warning";
     text = `Dernière collecte partielle · ${readingText}`;
   }
@@ -587,14 +562,6 @@ function renderCollectionDetail() {
     div.appendChild(labelEl);
     statsEl.appendChild(div);
   });
-
-  const dropped = document.getElementById("runs-dropped");
-  if (HEALTH.droppedRuns > 0) {
-    dropped.textContent = `${HEALTH.droppedRuns} enregistrement(s) hérités de la migration Google Sheets ont un horodatage invalide et sont exclus de ces chiffres.`;
-    dropped.hidden = false;
-  } else {
-    dropped.hidden = true;
-  }
 }
 
 /* ── Wiring ─────────────────────────────────────────────────────────────── */
@@ -691,8 +658,8 @@ async function init() {
     return;
   }
 
-  RUNS = usableRuns(DASHBOARD.runs);
-  HEALTH = computeHealth(RUNS);
+  RUNS = DASHBOARD.runs || [];
+  HEALTH = healthFromPayload(DASHBOARD.health);
 
   // The collection state is worth knowing even when there is nothing to plot —
   // "no data" and "the scraper is blocked" are different problems.

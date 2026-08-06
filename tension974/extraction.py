@@ -14,6 +14,14 @@ _PATTERN = re.compile(
     r"(?!\s*(?:sauvegard|enregistr|consult|vue))",
     re.IGNORECASE,
 )
+# Le raccourci « aucune annonce » → 0 doit porter le même garde-fou que le
+# motif principal : « Aucune annonce sauvegardée » (widget favoris) sur une
+# page qui contient le vrai compteur plus bas produirait un 0 en succès,
+# jamais retenté — pire qu'un échec.
+_NO_LISTINGS_PATTERN = re.compile(
+    r"aucune\s+annonce\b(?!\s*(?:sauvegard|enregistr|consult|vue))",
+    re.IGNORECASE,
+)
 # Nos recherches sont à l'échelle d'une ville : quelques dizaines à quelques
 # centaines d'annonces. Au-delà, c'est un artefact de parsing, pas un compteur.
 _MAX_PLAUSIBLE_COUNT = 50_000
@@ -54,7 +62,7 @@ def extract_total_listings_count(text: str) -> int | None:
     if not text:
         return None
 
-    if re.search(r"aucune\s+annonce", text, re.IGNORECASE):
+    if _NO_LISTINGS_PATTERN.search(text):
         return 0
 
     match = find_count_match(text)

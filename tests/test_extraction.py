@@ -35,6 +35,22 @@ def test_extract_regressions(text, expected):
     assert extract_total_listings_count(text) == expected
 
 
+@pytest.mark.parametrize("text,expected", [
+    # Régression v2 : le raccourci « aucune annonce » → 0 s'exécutait avant le
+    # motif principal SANS le garde-fou anti-widget. « Aucune annonce
+    # sauvegardée » (favoris vides) masquait le vrai compteur et produisait un
+    # 0 en succès, jamais retenté.
+    ("Aucune annonce sauvegardée\n\n242 annonces", 242),
+    ("Aucune annonce enregistrée dans vos favoris\n110 annonces", 110),
+    ("242 annonces\nAucune annonce sauvegardée", 242),
+    # Les vrais zéros restent des zéros.
+    ("Aucune annonce trouvée pour cette recherche", 0),
+    ("Aucune annonce ne correspond à vos critères", 0),
+])
+def test_no_listings_shortcut_ignores_widgets(text, expected):
+    assert extract_total_listings_count(text) == expected
+
+
 def test_extract_listing_prices():
     text = """
     242 annonces

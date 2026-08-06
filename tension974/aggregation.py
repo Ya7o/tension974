@@ -15,12 +15,18 @@ _STALE_AFTER_DAYS = 10
 
 
 def parse_iso(value: str | None) -> datetime | None:
-    if not value:
+    if not value or not isinstance(value, str):
         return None
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        dt = datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         return None
+    # Un horodatage sans fuseau (possible via l'ancienne migration Sheets ou
+    # une édition manuelle) est réputé UTC : mélanger naïf et aware ferait
+    # planter les tris et soustractions de tout le pipeline de publication.
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 def merge_runs(run_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -56,6 +62,11 @@ def merge_runs(run_events: list[dict[str, Any]]) -> list[dict[str, Any]]:
             category = CATEGORY_NONE
         elif status in ("partial", "failed"):
             category = categorize_error(run.get("error_message"))
+            if category == CATEGORY_NONE:
+                # Un run partial/failed sans message d'erreur ne doit jamais
+                # s'afficher « Succès » en vert : categorize_error(None) vaut
+                # none, on retombe sur unknown.
+                category = CATEGORY_UNKNOWN
         else:
             category = CATEGORY_UNKNOWN
         run["category"] = category
@@ -100,13 +111,18 @@ def _value_delta(series: list[dict[str, Any]], field: str, days: int, now: datet
     successful = [p for p in series if p["success"] and p.get(field) is not None]
     if len(successful) < 2:
         return None
-    cutoff = now - timedelta(days=days)
-    # Le point de référence ne peut jamais être le dernier relevé lui-même :
-    # quand le dernier succès était plus vieux que la fenêtre, il se comparait
-    # à lui-même et le dashboard affichait un faux « 0 % ». Il doit aussi être
-    # assez récent (2× la fenêtre) pour que la comparaison garde son sens après
-    # un trou de collecte — sinon on n'affiche rien plutôt qu'un delta trompeur.
-    max_age = now - timedelta(days=days * 2)
+    latest = successful[-1]
+    latest_dt = parse_iso(latest["observed_at"])
+    if latest_dt is None:
+        return None
+    # Fenêtre ancrée sur le DERNIER RELEVÉ, jamais sur l'heure de build : un
+    # KPI qui change selon la minute de régénération n'est pas un KPI. Le point
+    # de référence ne peut pas être le dernier relevé lui-même (l'ancien code
+    # le comparait à lui-même → faux « 0 % »), doit être au moins `days` plus
+    # vieux que lui, et pas plus de 2× la fenêtre — au-delà d'un trou de
+    # collecte, on n'affiche rien plutôt qu'un delta trompeur.
+    cutoff = latest_dt - timedelta(days=days)
+    max_age = latest_dt - timedelta(days=days * 2)
     older = []
     for p in successful[:-1]:
         dt = parse_iso(p["observed_at"])
@@ -114,9 +130,8 @@ def _value_delta(series: list[dict[str, Any]], field: str, days: int, now: datet
             older.append(p)
     if not older:
         return None
-    latest_value = successful[-1][field]
     old_value = older[-1][field]
-    return {"delta": latest_value - old_value, "from": old_value, "to": latest_value}
+    return {"delta": latest[field] - old_value, "from": old_value, "to": latest[field]}
 
 
 def compute_kpis(series: list[dict[str, Any]], now: datetime | None = None) -> dict[str, Any]:
@@ -190,7 +205,13 @@ def compute_health(merged_runs: list[dict[str, Any]], now: datetime | None = Non
         "category_counts_30d": category_counts,
         "last_success_at": last_success["started_at"] if last_success else None,
         "last_finished_status": last_finished["status"] if last_finished else None,
+        "last_productive_at": last_productive["started_at"] if last_productive else None,
+        # stale_days/is_stale sont figés à la date de génération : ils servent
+        # aux consommateurs du JSON. Le dashboard, lui, recalcule la fraîcheur
+        # à l'affichage depuis last_productive_at — sinon un pipeline mort
+        # afficherait « à jour » pour toujours.
         "stale_days": stale_days,
         "is_stale": stale_days is None or stale_days >= _STALE_AFTER_DAYS,
+        "stale_after_days": _STALE_AFTER_DAYS,
         "total_runs": len(merged_runs),
     }

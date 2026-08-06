@@ -1,9 +1,9 @@
 import logging
-import re
 import time
 import yaml
 from datetime import datetime, timezone
 
+from .diagnostics.classify import CATEGORY_BLOCKED, categorize_error
 from .models import FetchResult, Observation, SearchConfig
 from .extraction import extract_price_stats, extract_total_listings_count, find_count_match
 from .providers.base import FetchProvider
@@ -12,14 +12,6 @@ from .storage import SQLiteStorage, Storage
 logger = logging.getLogger("tension974.collector")
 _MAX_FETCH_ATTEMPTS = 2
 _RETRY_DELAY_SECONDS = 5
-
-# Interstitiel DataDome et parents : la page servie demande d'activer JS ou de
-# couper le bloqueur de pub. La distinguer d'un vrai changement de page permet
-# au dashboard d'afficher "Bloqué (anti-bot)" plutôt que "Page changée".
-_ANTIBOT_SIGNATURE = re.compile(
-    r"enable\s+js|ad\s*blocker|datadome|captcha|access\s+denied",
-    re.IGNORECASE,
-)
 
 
 def load_searches(config_path: str) -> list[SearchConfig]:
@@ -115,7 +107,11 @@ def _fetch_with_retry(search: SearchConfig, provider: FetchProvider) -> FetchRes
         # count is a failed fetch, and these blocks are intermittent enough
         # that the retry below usually clears them.
         if result.success and extract_total_listings_count(result.content) is None:
-            blocked = bool(result.content) and bool(_ANTIBOT_SIGNATURE.search(result.content))
+            # Une seule source de vérité pour reconnaître un interstitiel
+            # anti-bot (DataDome, Cloudflare, Akamai…) : les motifs de
+            # classify, appliqués au contenu servi. Le message produit doit
+            # lui-même être classé « blocked » côté dashboard.
+            blocked = bool(result.content) and categorize_error(result.content) == CATEGORY_BLOCKED
             result = FetchResult(
                 success=False,
                 content=result.content,
@@ -194,7 +190,10 @@ def run_collection_with_storage(
             if obs.status != "success":
                 errors.append(obs)
 
-        status = "success" if not errors else ("partial" if results else "failed")
+        # `results` contient aussi les observations en échec : le run est
+        # « failed » quand TOUTES les recherches ont échoué, « partial » sinon.
+        # (L'ancien test `if results` était toujours vrai — failed inatteignable.)
+        status = "success" if not errors else ("failed" if len(errors) == len(results) else "partial")
         err_msg = "; ".join(o.error_message or "" for o in errors) if errors else None
         storage.finish_run(run_id, status, err_msg)
     except Exception as exc:

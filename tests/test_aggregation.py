@@ -1,5 +1,5 @@
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -9,13 +9,14 @@ from tension974.aggregation import (
     compute_health,
     compute_kpis,
     merge_runs,
+    parse_iso,
 )
 
 NOW = datetime(2026, 4, 27, 12, 0, tzinfo=timezone.utc)
 
 
 def _obs(days_ago, count, status="success", median_price=None, error_message=None):
-    dt = NOW.replace(hour=0) - __import__("datetime").timedelta(days=days_ago)
+    dt = NOW.replace(hour=0) - timedelta(days=days_ago)
     return {
         "search_id": "studio_saint_denis",
         "observed_at": dt.isoformat(),
@@ -98,10 +99,45 @@ def test_delta_never_compares_latest_point_to_itself():
         _obs(days_ago=1, count=None, status="failed", error_message="blocked"),
     ], "studio_saint_denis")
     kpis = compute_kpis(series, now=NOW)
-    # Le dernier succès (86, il y a 8 j) est lui-même hors fenêtre : l'ancien
-    # code le comparait à lui-même (from=86, to=86, delta=0). Désormais on
-    # n'affiche rien du tout.
-    assert kpis["delta_7d"] is None
+    # Le dernier succès (86, il y a 8 j) était comparé à lui-même (from=86,
+    # to=86, delta=0). La fenêtre étant désormais ancrée sur le dernier relevé,
+    # la référence est bien le point PRÉCÉDENT (90, 7 j avant lui).
+    assert kpis["delta_7d"] == {"delta": -4, "from": 90, "to": 86}
+
+
+def test_delta_window_is_anchored_on_latest_reading_not_build_time():
+    """Rejouer le build à une autre heure ne doit pas changer les KPI."""
+    series = build_search_timeseries([
+        _obs(days_ago=8, count=100),
+        _obs(days_ago=1, count=90),
+    ], "studio_saint_denis")
+    early = compute_kpis(series, now=NOW)
+    hours_later = compute_kpis(series, now=NOW + timedelta(hours=20))
+    assert early["delta_7d"] == hours_later["delta_7d"] == {"delta": -10, "from": 100, "to": 90}
+
+
+def test_delta_reference_bounds_relative_to_latest():
+    """Bornes de la fenêtre : [latest-2×j, latest-j], testées aux extrémités."""
+    # Référence exactement à 2× la fenêtre du dernier relevé : incluse.
+    series = build_search_timeseries([
+        _obs(days_ago=15, count=100),  # latest(day1) - 14 j exactement
+        _obs(days_ago=1, count=90),
+    ], "studio_saint_denis")
+    assert compute_kpis(series, now=NOW)["delta_7d"] == {"delta": -10, "from": 100, "to": 90}
+
+    # Un jour au-delà : exclue, pas de delta plutôt qu'un delta trompeur.
+    series = build_search_timeseries([
+        _obs(days_ago=16, count=100),
+        _obs(days_ago=1, count=90),
+    ], "studio_saint_denis")
+    assert compute_kpis(series, now=NOW)["delta_7d"] is None
+
+    # Plus récent que la fenêtre (6 j avant latest) : exclue aussi.
+    series = build_search_timeseries([
+        _obs(days_ago=7, count=100),
+        _obs(days_ago=1, count=90),
+    ], "studio_saint_denis")
+    assert compute_kpis(series, now=NOW)["delta_7d"] is None
 
 
 def test_delta_reference_point_cannot_be_arbitrarily_old():
@@ -113,6 +149,46 @@ def test_delta_reference_point_cannot_be_arbitrarily_old():
     kpis = compute_kpis(series, now=NOW)
     assert kpis["delta_7d"] is None
     assert kpis["delta_30d"] is None
+
+
+def test_parse_iso_normalizes_naive_timestamps_to_utc():
+    """Régression v2 : un horodatage sans fuseau faisait planter tout le tri
+    (TypeError aware/naive) — donc toute la publication du dashboard."""
+    naive = parse_iso("2026-04-20 17:15:00")
+    aware = parse_iso("2026-04-20T17:15:00+00:00")
+    assert naive == aware
+    assert naive.tzinfo is not None
+
+
+def test_parse_iso_rejects_non_strings():
+    assert parse_iso(None) is None
+    assert parse_iso(20260420) is None
+    assert parse_iso("pas une date") is None
+
+
+def test_merge_runs_survives_naive_timestamps():
+    events = [
+        {"run_id": "aware", "started_at": "2026-04-26T00:00:00+00:00", "status": "running", "provider": "p"},
+        {"run_id": "aware", "finished_at": "2026-04-26T00:00:05+00:00", "status": "success"},
+        # Horodatage naïf (migration Sheets, édition manuelle…) : réputé UTC.
+        {"run_id": "naive", "started_at": "2026-04-01 00:00:00", "status": "running", "provider": "p"},
+        {"run_id": "naive", "finished_at": "2026-04-01 00:00:05", "status": "success"},
+    ]
+    merged = merge_runs(events)
+    assert [r["run_id"] for r in merged] == ["aware", "naive"]
+    health = compute_health(merged, now=NOW)
+    assert health["total_runs"] == 2
+
+
+def test_merge_runs_partial_without_message_is_not_a_success():
+    """Régression v2 : partial/failed sans error_message était catégorisé
+    « none » (Succès, vert) — 8 des 9 runs partial de l'historique."""
+    events = [
+        {"run_id": "p1", "started_at": "2026-04-26T00:00:00+00:00", "status": "running", "provider": "p"},
+        {"run_id": "p1", "finished_at": "2026-04-26T00:00:05+00:00", "status": "partial"},
+    ]
+    merged = merge_runs(events)
+    assert merged[0]["category"] == "unknown"
 
 
 def test_merge_runs_drops_rows_without_iso_started_at():

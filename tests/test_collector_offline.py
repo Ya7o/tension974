@@ -1,12 +1,8 @@
 import tempfile
 import os
-import pytest
-from pathlib import Path
-import sys
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 import json
+
+import pytest
 
 from tension974.database import init_db, get_observations
 from tension974.models import FetchResult, SearchConfig

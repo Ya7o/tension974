@@ -1,2 +1,0 @@
-# tension974 — collecte quotidienne à 21h15
-15 21 * * * cd /chemin/vers/tension974 && /chemin/vers/tension974/.venv/bin/python scripts/collect.py >> logs/cron.log 2>&1

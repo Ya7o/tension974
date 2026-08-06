@@ -1,0 +1,14 @@
+[project]
+name = "tension974"
+version = "1.0.0"
+description = "Suivi automatisé de la tension locative à Saint-Denis de La Réunion (Leboncoin → JSONL → dashboard GitHub Pages)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Boris Niess" }]
+
+[tool.pytest.ini_options]
+# testpaths borne la collecte au dossier tests/ : les fonctions test_* de
+# tension974/diagnostics/scraping_matrix.py (du scraping réseau réel) ne
+# doivent jamais être ramassées par pytest.
+testpaths = ["tests"]

@@ -46,8 +46,6 @@ def test_leboncoin_searches_have_leboncoin_urls():
 
 
 def test_load_searches_parses_the_real_config():
-    import sys
-    sys.path.insert(0, str(Path(__file__).parent.parent))
     from tension974.collector import load_searches
     searches = load_searches(str(CONFIG_PATH))
     assert len(searches) >= 1

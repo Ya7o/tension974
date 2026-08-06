@@ -1,8 +1,5 @@
-import sys
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tension974.aggregation import (
     build_search_timeseries,
@@ -87,11 +84,11 @@ def test_compute_kpis_delta_7d_and_30d():
 
 
 def test_delta_never_compares_latest_point_to_itself():
-    """Régression : dernier succès plus vieux que la fenêtre → pas de delta.
+    """Régression : le dernier succès ne peut pas être sa propre référence.
 
     Cas réel (t2_t3, juillet 2026) : le dernier relevé réussi datait de plus
     de 7 jours, il était sélectionné des deux côtés de la comparaison et le
-    dashboard affichait « → 0 % / 7 j » au lieu d'admettre l'absence de donnée.
+    dashboard affichait « → 0 % / 7 j » au lieu du vrai mouvement.
     """
     series = build_search_timeseries([
         _obs(days_ago=15, count=90),

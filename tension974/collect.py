@@ -22,8 +22,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--storage",
         choices=("sqlite", "jsonl"),
-        default="sqlite",
-        help="Backend de stockage.",
+        # jsonl est le backend de production (data/*.jsonl, versionné par git,
+        # consommé par le dashboard). L'ancien défaut sqlite était un piège :
+        # une « collecte manuelle » suivant le README écrivait dans une base
+        # gitignorée que rien ne lisait.
+        default="jsonl",
+        help="Backend de stockage (jsonl = production).",
     )
     parser.add_argument(
         "--firecrawl",

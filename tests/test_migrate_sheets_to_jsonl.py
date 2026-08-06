@@ -1,8 +1,3 @@
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
 from scripts.migrate_sheets_to_jsonl import convert_observations, convert_runs
 
 

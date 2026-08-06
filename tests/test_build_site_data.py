@@ -1,9 +1,6 @@
 import json
-import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from scripts.build_site_data import build
 

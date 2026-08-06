@@ -1,10 +1,7 @@
 import tempfile
 import os
 import pytest
-from pathlib import Path
-import sys
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tension974.database import init_db, insert_observation, get_observations, get_last_observation
 from tension974.models import Observation

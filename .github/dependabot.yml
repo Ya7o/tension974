@@ -1,0 +1,14 @@
+# Les dépendances sont épinglées au patch près et les actions par SHA :
+# sans Dependabot, ces pins figeraient aussi les correctifs de sécurité.
+version: 2
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

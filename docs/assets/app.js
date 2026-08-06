@@ -549,7 +549,9 @@ function renderCollectionDetail() {
 
   const statsEl = document.getElementById("health-stats");
   statsEl.innerHTML = "";
-  const asPercent = (rate) => (rate === null ? "—" : `${Math.round(rate * 100)}%`);
+  // == null couvre null ET undefined : une clé absente d'un vieux
+  // dashboard.json en cache afficherait sinon « NaN% ».
+  const asPercent = (rate) => (rate == null ? "—" : `${Math.round(rate * 100)}%`);
   [
     ["Succès sur 7 j", asPercent(HEALTH.successRate7d)],
     ["Succès sur 30 j", asPercent(HEALTH.successRate30d)],
@@ -670,8 +672,9 @@ async function init() {
   // The collection state is worth knowing even when there is nothing to plot —
   // "no data" and "the scraper is blocked" are different problems.
   renderStatusPill();
-  document.getElementById("generated-at").textContent =
-    `Données générées le ${formatDateTimeFull(DASHBOARD.generated_at)}`;
+  document.getElementById("generated-at").textContent = DASHBOARD.generated_at
+    ? `Données générées le ${formatDateTimeFull(DASHBOARD.generated_at)}`
+    : "";
 
   const hasAnyData = DASHBOARD.searches.some((s) => s.timeseries.length > 0);
   if (!hasAnyData) {

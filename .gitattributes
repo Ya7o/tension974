@@ -1,0 +1,4 @@
+# Les JSONL de données sont append-only : deux branches qui ajoutent des
+# lignes ne sont jamais en vrai conflit. merge=union concatène les ajouts et
+# rend le pull --rebase du workflow de collecte auto-résoluble.
+data/*.jsonl merge=union

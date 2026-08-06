@@ -20,6 +20,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          # Historique complet : le retry de push fait un pull --rebase, qui a
+          # besoin de l'ancêtre commun (impossible sur un clone shallow).
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5
@@ -31,23 +35,28 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
+      # Timeout au niveau de l'ÉTAPE, pas seulement du job : si le timeout du
+      # job se déclenchait, GitHub annulerait tout — étapes de sauvegarde
+      # comprises. Ici un fetch qui pend est coupé au bout de 12 min, et il
+      # reste 8 min au job pour committer ce qui a été écrit.
       - name: Collect into data/*.jsonl
+        timeout-minutes: 12
         env:
-          # Le secret n'est visible que de cette étape, pas de pip/pytest.
+          # Le secret n'est visible que de cette étape, pas de pip.
           FIRECRAWL_API_KEY: ${{ secrets.FIRECRAWL_API_KEY }}
         run: python -m tension974.collect --storage jsonl --firecrawl
 
       # Le runner est éphémère : tout ce qui n'est pas poussé est perdu, et la
-      # série est hebdomadaire. Les deux étapes suivantes tournent donc même si
-      # la collecte a échoué, pour ne jamais perdre les observations déjà
-      # écrites dans data/*.jsonl (y compris les échecs, qui font partie de
-      # l'historique).
+      # série est hebdomadaire. Les deux étapes suivantes tournent donc quoi
+      # qu'il arrive — échec OU annulation — pour ne jamais perdre les
+      # observations déjà écrites dans data/*.jsonl (y compris les échecs,
+      # qui font partie de l'historique).
       - name: Build GitHub Pages dashboard data
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         run: python scripts/build_site_data.py
 
       - name: Commit and push updated data
-        if: ${{ !cancelled() }}
+        if: ${{ always() }}
         run: |
           git config user.name "tension974-bot"
           git config user.email "tension974-bot@users.noreply.github.com"
@@ -61,6 +70,7 @@ jobs:
                 exit 0
               fi
               echo "Push failed (attempt ${attempt}), rebasing on origin/${{ github.ref_name }}"
+              git rebase --abort 2>/dev/null || true
               git pull --rebase origin "${{ github.ref_name }}"
               sleep 5
             done
@@ -68,12 +78,12 @@ jobs:
           fi
 
       - name: Report failure in run summary
-        if: failure()
+        if: ${{ failure() || cancelled() }}
         run: |
           {
-            echo "## Collecte en échec"
+            echo "## Collecte en échec ou interrompue"
             echo ""
-            echo "Le job hebdomadaire a échoué. Vérifier :"
-            echo "- le log de l'étape *Collect* (blocage anti-bot, clé ou crédits Firecrawl) ;"
+            echo "Le job hebdomadaire ne s'est pas terminé normalement. Vérifier :"
+            echo "- le log de l'étape *Collect* (blocage anti-bot, clé ou crédits Firecrawl, timeout) ;"
             echo "- que le commit des données a bien eu lieu malgré l'échec (étape *Commit and push*)."
           } >> "$GITHUB_STEP_SUMMARY"

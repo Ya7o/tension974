@@ -49,12 +49,15 @@ cp .env.example .env
 ## Collecte manuelle
 
 ```bash
-# Stockage local SQLite (dev)
-python scripts/collect.py
+# Collecte de production : Firecrawl → data/*.jsonl (le défaut est jsonl)
+python -m tension974.collect --firecrawl
 
-# Stockage git-natif jsonl (celui utilisé en production par collect.yml)
-python -m tension974.collect --storage jsonl --firecrawl
+# Variante dev : stockage SQLite local (n'alimente PAS le dashboard)
+python -m tension974.collect --storage sqlite
 ```
+
+Après une collecte manuelle, régénérer le dashboard puis committer
+`data/*.jsonl` et `docs/data/dashboard.json`.
 
 ## Régénérer le dashboard
 
@@ -129,6 +132,14 @@ tension974/
 │   └── providers/
 │       ├── firecrawl_provider.py
 │       └── simple_http_provider.py
-├── requirements.txt
+├── requirements.txt           # Dépendances de production (épinglées)
+├── requirements-dev.txt       # Tests et diagnostic
 └── .env                       # Clé API (ne pas versionner)
 ```
+
+## Licence
+
+Code publié sous licence [MIT](LICENSE). Les données collectées proviennent
+de pages publiques Leboncoin et ne sont conservées que sous forme agrégée
+(compteurs et statistiques de prix) — voir
+`tension974-docs/11_SECURITY_AND_COMPLIANCE_NOTES.md`.

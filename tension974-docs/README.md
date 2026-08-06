@@ -1,55 +1,52 @@
-# tension974 — Pack documentaire de cadrage
+# tension974 — Pack documentaire
 
-Ce dossier contient les documents de cadrage nécessaires pour faire développer le MVP du projet **tension974** par un agent IA développeur.
+Documents de cadrage du projet **tension974** : suivi automatisé de la
+tension locative à Saint-Denis de La Réunion.
 
-## Objectif
+## Architecture actuelle (depuis juillet 2026)
 
-Automatiser le suivi quotidien du nombre total d'annonces Leboncoin correspondant à une recherche locative précise à La Réunion.
+- Collecte : **hebdomadaire** (jeudi 17h15 UTC), GitHub Actions
+  (`.github/workflows/collect.yml`), provider **Firecrawl**.
+- Stockage : **JSONL append-only versionné par git** (`data/observations.jsonl`,
+  `data/runs.jsonl`) — plus de base externe, plus de Google Sheets.
+- Publication : `scripts/build_site_data.py` agrège en
+  `docs/data/dashboard.json`, servi par **GitHub Pages** (dashboard statique
+  sans dépendance, `docs/`).
+- Recherches suivies : Studio, T2/T3 et T3 à Saint-Denis
+  (`config/searches.yaml`).
 
-- Recherche MVP : Saint-Denis - T3
-- Source : Leboncoin
-- URL : https://www.leboncoin.fr/recherche?text=t3&locations=Saint-Denis_97400__-20.89076_55.45851_5000_1000&from=rs
-- Métrique : nombre total d'annonces affiché, par exemple `242 annonces`
-- Fréquence : tous les soirs à 21h15
-- Environnement : Kali Linux, Python, accès SSH
-- Dashboard : Streamlit
-- Stockage : SQLite + export CSV
-- Collecte : Firecrawl comme provider principal
+L'architecture d'origine du MVP (SQLite + Streamlit + cron quotidien sur
+Kali Linux, Google Sheets en stockage cloud) a été retirée ; voir
+`12_DECISION_LOG.md` (DECISION-009 à 012) pour l'historique et les raisons.
 
-## Usage prévu
+## État des documents
 
-Ce pack doit être donné à un agent IA développeur qui doit coder le projet complet sans interaction utilisateur.
+| Document | État |
+|---|---|
+| `01_PRODUCT_SPEC.md` | À jour (produit et métrique inchangés) |
+| `04_DATA_COLLECTION_SPEC.md` | À jour (collecte Firecrawl, retry anti-bot) |
+| `06_DASHBOARD_SPEC.md` | À jour (dashboard statique GitHub Pages) |
+| `11_SECURITY_AND_COMPLIANCE_NOTES.md` | À jour |
+| `12_DECISION_LOG.md` | À jour — **journal de référence** |
+| `13_ROADMAP.md` | À jour |
+| `15_UI_AUDIT_ET_PARCOURS.md` | À jour (audit UI ayant motivé la refonte) |
+| `00_PROJECT_BRIEF.md` | ⚠️ Historique (architecture d'origine) |
+| `02_FUNCTIONAL_SPEC.md` | ⚠️ Historique |
+| `03_TECHNICAL_SPEC.md` | ⚠️ Historique |
+| `05_DATA_MODEL.md` | ⚠️ Historique (modèle SQLite) |
+| `07_AI_AGENT_BUILD_INSTRUCTIONS.md` | ⚠️ Historique |
+| `08_DEVELOPMENT_PLAN.md` | ⚠️ Historique |
+| `09_TEST_STRATEGY.md` | ⚠️ Historique |
+| `10_DEPLOYMENT_GUIDE_KALI.md` | ⚠️ Historique (déploiement retiré) |
+| `14_ACCEPTANCE_CHECKLIST.md` | ⚠️ Historique |
 
-L'agent doit :
-1. lire tous les documents ;
-2. respecter le périmètre MVP ;
-3. coder l'application ;
-4. créer les tests ;
-5. exécuter les tests ;
-6. documenter ce qui est validé ;
-7. ne pas déclarer le projet terminé tant que les critères d'acceptation ne sont pas couverts.
+Les documents « historiques » portent une bannière en tête et sont conservés
+pour référence : ils décrivent le MVP tel qu'il a été commandé, pas le
+système actuel.
 
-## Documents
+## Périmètre — rappel
 
-- `00_PROJECT_BRIEF.md` : vision courte du projet.
-- `01_PRODUCT_SPEC.md` : spécification produit.
-- `02_FUNCTIONAL_SPEC.md` : fonctionnalités attendues.
-- `03_TECHNICAL_SPEC.md` : architecture technique.
-- `04_DATA_COLLECTION_SPEC.md` : collecte Firecrawl et extraction.
-- `05_DATA_MODEL.md` : modèle SQLite.
-- `06_DASHBOARD_SPEC.md` : dashboard Streamlit.
-- `07_AI_AGENT_BUILD_INSTRUCTIONS.md` : instructions strictes pour agent IA.
-- `08_DEVELOPMENT_PLAN.md` : plan de développement.
-- `09_TEST_STRATEGY.md` : stratégie de tests.
-- `10_DEPLOYMENT_GUIDE_KALI.md` : guide de déploiement Kali Linux.
-- `11_SECURITY_AND_COMPLIANCE_NOTES.md` : limites conformité et sécurité.
-- `12_DECISION_LOG.md` : journal des décisions.
-- `13_ROADMAP.md` : évolutions futures.
-- `14_ACCEPTANCE_CHECKLIST.md` : checklist de livraison.
-- `15_UI_AUDIT_ET_PARCOURS.md` : audit de l'interface et parcours utilisateur
-  ayant motivé la refonte UI (spec de la vue résultante : section V3 de
-  `06_DASHBOARD_SPEC.md`).
-
-## Important
-
-Le MVP ne doit pas chercher à scraper toutes les annonces. Il doit uniquement récupérer un chiffre agrégé : le nombre total d'annonces pour la recherche configurée.
+Le projet ne scrape pas les annonces individuelles. Il relève un chiffre
+agrégé par recherche (le nombre total d'annonces affiché par Leboncoin,
+p. ex. « 242 annonces ») et des statistiques de prix calculées sur les prix
+visibles de la première page de résultats.

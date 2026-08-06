@@ -194,12 +194,14 @@ changement de `dashboard.json`.
 
 ### Robustesse d'affichage des runs
 
-Les enregistrements de `runs[]` dont `started_at` n'est pas un horodatage ISO
-valide (lignes héritées de la migration Google Sheets, colonnes décalées) sont
-**exclus à l'affichage**, et les taux de succès affichés sont recalculés sur le
-reste. Le nombre d'enregistrements exclus est indiqué dans le bloc *État de la
-collecte*. Les données brutes et `tension974/aggregation.py` ne sont pas
-modifiés — c'est une protection de l'affichage, pas un correctif de fond.
+La robustesse est traitée **à la source**, plus à l'affichage (audit d'août
+2026) : les lignes héritées de la migration Google Sheets ont été réparées
+dans `data/runs.jsonl`, et `tension974/aggregation.py` (`merge_runs`) écarte
+défensivement tout run sans `started_at` ISO exploitable avant publication.
+Le front consomme `runs[]` et `health` tels quels ; la seule logique qu'il
+recalcule à l'affichage est la **fraîcheur** (`staleDays`), car un
+`dashboard.json` n'est régénéré que lorsque le pipeline tourne — une valeur
+figée dirait « à jour » pour toujours sur un pipeline mort.
 
 ### Sémantique de couleur
 

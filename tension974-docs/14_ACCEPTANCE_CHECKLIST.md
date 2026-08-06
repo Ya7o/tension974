@@ -1,5 +1,13 @@
 # 14 — Acceptance Checklist
 
+> ⚠️ **Document historique.** Cette spec décrit l'architecture d'origine du
+> MVP (SQLite + Streamlit + cron quotidien sur Kali Linux), remplacée en
+> juillet 2026 par : collecte hebdomadaire GitHub Actions → stockage JSONL
+> versionné (`data/*.jsonl`) → dashboard statique GitHub Pages (`docs/`).
+> Conservée pour référence. Sources à jour : le `README.md` du dépôt et
+> `12_DECISION_LOG.md` (DECISION-009 à 012).
+
+
 L'agent IA doit remplir cette checklist avant de considérer le projet terminé.
 
 ## Structure

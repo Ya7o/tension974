@@ -1,4 +1,5 @@
 import argparse
+import os
 import sys
 
 from .collector import run_collection_with_storage
@@ -79,15 +80,15 @@ def main(argv: list[str] | None = None) -> int:
     return 0
 
 
-# ~15-30 crédits consommés par semaine (retry compris) : en dessous de ce
-# seuil, il reste moins d'un mois de collecte.
+# ~15-30 crédits consommés par semaine (retry compris) : sous ce seuil, il
+# reste environ un mois de collecte au rythme le plus coûteux.
 _LOW_CREDITS_THRESHOLD = 120
 
 
 def _report_credits(provider, logger) -> None:
     credits = provider.get_account_credits()
     remaining = credits.get("remaining_credits") if isinstance(credits, dict) else None
-    if remaining is None:
+    if not isinstance(remaining, (int, float)):
         logger.warning(
             "Solde de crédits Firecrawl indisponible : %s",
             credits.get("error", "réponse inattendue") if isinstance(credits, dict) else credits,
@@ -95,11 +96,18 @@ def _report_credits(provider, logger) -> None:
         return
     print(f"[CREDITS] {remaining} crédit(s) Firecrawl restant(s)")
     if remaining < _LOW_CREDITS_THRESHOLD:
-        logger.warning(
-            "Solde Firecrawl bas : %s crédits restants (seuil %s) — moins d'un mois de collecte.",
-            remaining,
-            _LOW_CREDITS_THRESHOLD,
+        message = (
+            f"Solde Firecrawl bas : {remaining} crédits restants "
+            f"(seuil {_LOW_CREDITS_THRESHOLD}) — environ un mois de collecte au rythme le plus coûteux."
         )
+        logger.warning("%s", message)
+        # Un warning dans le log d'un job vert n'alerte personne : on le fait
+        # remonter en annotation GitHub et dans le résumé du run.
+        print(f"::warning title=Crédits Firecrawl bas::{message}")
+        summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+        if summary_path:
+            with open(summary_path, "a", encoding="utf-8") as f:
+                f.write(f"\n### ⚠️ Crédits Firecrawl bas\n\n{message}\n")
 
 
 def _build_storage(name: str):

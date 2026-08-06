@@ -254,6 +254,23 @@ def _save_debug(name: str, content: str | bytes) -> None:
         path.write_text(content, encoding="utf-8")
 
 
+def _scrub_headers(headers) -> dict:
+    """Copie des en-têtes sans les cookies.
+
+    Les dumps de debug partent en artefact CI public (et ont déjà fini
+    committés) : un `set-cookie: datadome=…` y vivrait un an. On les remplace
+    par un marqueur plutôt que de les supprimer, pour garder l'information
+    qu'un cookie a été servi.
+    """
+    scrubbed = {}
+    for key, value in dict(headers).items():
+        if key.lower() in ("set-cookie", "cookie"):
+            scrubbed[key] = "[cookie retiré du dump]"
+        else:
+            scrubbed[key] = value
+    return scrubbed
+
+
 # ── HTTPX helper ──────────────────────────────────────────────────────────────
 
 
@@ -293,7 +310,7 @@ def _httpx_get(test_id: str, url: str, headers: dict, http2: bool = False) -> di
         _save_debug(
             f"{test_id}_metadata.json",
             json.dumps(
-                {"status_code": resp.status_code, "headers": dict(resp.headers)},
+                {"status_code": resp.status_code, "headers": _scrub_headers(resp.headers)},
                 indent=2,
             ),
         )
@@ -894,7 +911,7 @@ def test_http_session_warmup(url: str) -> dict:
         _save_debug("http_session_warmup_response.html", html)
         _save_debug(
             "http_session_warmup_metadata.json",
-            json.dumps({"status_code": resp.status_code, "headers": dict(resp.headers)}, indent=2),
+            json.dumps({"status_code": resp.status_code, "headers": _scrub_headers(resp.headers)}, indent=2),
         )
     except Exception as exc:
         result["error"] = str(exc)
@@ -951,7 +968,7 @@ def test_http_curl_cffi(url: str) -> dict:
         _save_debug("http_curl_cffi_response.html", html)
         _save_debug(
             "http_curl_cffi_metadata.json",
-            json.dumps({"status_code": resp.status_code, "headers": dict(resp.headers)}, indent=2),
+            json.dumps({"status_code": resp.status_code, "headers": _scrub_headers(resp.headers)}, indent=2),
         )
     except Exception as exc:
         result["error"] = str(exc)

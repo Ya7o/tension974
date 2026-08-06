@@ -73,6 +73,7 @@ python scripts/export_csv.py
 ## Tests
 
 ```bash
+pip install -r requirements-dev.txt  # outils de test/diagnostic (une fois)
 pytest
 ```
 

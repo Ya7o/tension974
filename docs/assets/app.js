@@ -109,13 +109,15 @@ function trendChip(trend, { noun, neutral = false } = {}) {
 }
 
 /* ── Collection health ──────────────────────────────────────────────────
- * Computed once, server-side, by tension974/aggregation.py (compute_health)
- * and published in dashboard.json — a single implementation instead of a
- * Python/JS pair that had already drifted apart. This adapter only maps the
- * snake_case payload to the names used below.
+ * Rates and categories come from tension974/aggregation.py (compute_health),
+ * published in dashboard.json — a single implementation instead of a
+ * Python/JS pair that had already drifted apart. Staleness is the exception:
+ * it MUST be recomputed at view time. dashboard.json is only regenerated when
+ * the pipeline runs, so a frozen stale_days would keep saying "up to date"
+ * forever on a dead pipeline — the one failure it exists to reveal.
  */
 
-function healthFromPayload(h) {
+function healthFromPayload(h, now = Date.now()) {
   if (!h) {
     return {
       successRate7d: null,
@@ -128,14 +130,18 @@ function healthFromPayload(h) {
       totalRuns: 0,
     };
   }
+  const staleDays = h.last_productive_at
+    ? Math.floor((now - new Date(h.last_productive_at).getTime()) / 86400000)
+    : null;
+  const staleAfter = typeof h.stale_after_days === "number" ? h.stale_after_days : 10;
   return {
     successRate7d: h.success_rate_7d,
     successRate30d: h.success_rate_30d,
     categoryCounts30d: h.category_counts_30d || {},
     lastSuccessAt: h.last_success_at,
     lastFinishedStatus: h.last_finished_status,
-    staleDays: h.stale_days,
-    isStale: h.is_stale,
+    staleDays,
+    isStale: staleDays === null || staleDays >= staleAfter,
     totalRuns: h.total_runs,
   };
 }

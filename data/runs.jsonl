@@ -55,4 +55,4 @@
 {"error_message": null, "finished_at": null, "provider": "firecrawl", "run_id": "389103389d9f", "started_at": "2026-07-23T18:21:55.291485+00:00", "status": "running"}
 {"error_message": null, "finished_at": "2026-07-23T18:23:24.665285+00:00", "provider": null, "run_id": "389103389d9f", "started_at": null, "status": "success"}
 {"error_message": null, "finished_at": null, "provider": "firecrawl", "run_id": "4b96d53697ed", "started_at": "2026-07-30T18:42:04.089903+00:00", "status": "running"}
-{"error_message": "No listings count found in content.", "finished_at": "2026-07-30T18:43:02.951524+00:00", "provider": null, "run_id": "4b96d53697ed", "started_at": null, "status": "partial"}
+{"error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker).", "finished_at": "2026-07-30T18:43:02.951524+00:00", "provider": null, "run_id": "4b96d53697ed", "started_at": null, "status": "partial"}

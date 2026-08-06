@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-05T18:02:52.886550+00:00",
+  "generated_at": "2026-08-06T04:42:33.964431+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -16,16 +16,16 @@
           "to": 110
         },
         "delta_30d": {
-          "delta": -31,
-          "from": 141,
+          "delta": -39,
+          "from": 149,
           "to": 110
         },
         "latest_median_price": 670,
         "latest_average_price": 646,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 45,
-          "from": 625,
+          "delta": 20,
+          "from": 650,
           "to": 670
         },
         "success_rate_30d": 1.0,
@@ -715,25 +715,29 @@
       "kpis": {
         "latest_count": 86,
         "latest_date": "2026-07-23",
-        "delta_7d": null,
-        "delta_30d": {
+        "delta_7d": {
           "delta": 4,
           "from": 82,
+          "to": 86
+        },
+        "delta_30d": {
+          "delta": -4,
+          "from": 90,
           "to": 86
         },
         "latest_median_price": 898,
         "latest_average_price": 891,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": -12,
-          "from": 910,
+          "delta": 3,
+          "from": 895,
           "to": 898
         },
         "success_rate_30d": 0.75,
         "last_failure": {
           "date": "2026-07-30",
-          "category": "no_data",
-          "message": "No listings count found in content."
+          "category": "blocked",
+          "message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         }
       },
       "timeseries": [
@@ -950,8 +954,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-04-28T06:46:27.401776+00:00",
@@ -986,8 +990,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-05-16T18:04:50.810562+00:00",
@@ -1010,8 +1014,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-05-28T19:44:51.771758+00:00",
@@ -1022,8 +1026,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-06-04T19:30:57.257000+00:00",
@@ -1034,8 +1038,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-06-11T19:44:38.066419+00:00",
@@ -1046,8 +1050,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-06-18T19:36:29.950467+00:00",
@@ -1070,8 +1074,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-07-02T18:46:29.910509+00:00",
@@ -1130,8 +1134,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         }
       ]
     },
@@ -1158,15 +1162,15 @@
         "latest_average_price": 1242,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 72,
-          "from": 1128,
+          "delta": 15,
+          "from": 1185,
           "to": 1200
         },
         "success_rate_30d": 1.0,
         "last_failure": {
           "date": "2026-06-11",
-          "category": "no_data",
-          "message": "No listings count found in content."
+          "category": "blocked",
+          "message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         }
       },
       "timeseries": [
@@ -1647,8 +1651,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-05-16T18:05:06.509069+00:00",
@@ -1683,8 +1687,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-06-04T19:31:09.830907+00:00",
@@ -1695,8 +1699,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-06-11T19:44:52.909822+00:00",
@@ -1707,8 +1711,8 @@
           "average_price": null,
           "price_sample_size": null,
           "provider": "firecrawl",
-          "error_category": "no_data",
-          "error_message": "No listings count found in content."
+          "error_category": "blocked",
+          "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
         },
         {
           "observed_at": "2026-06-18T19:37:27.244820+00:00",
@@ -1803,9 +1807,9 @@
       "provider": "firecrawl",
       "started_at": "2026-07-30T18:42:04.089903+00:00",
       "status": "partial",
-      "error_message": "No listings count found in content.",
+      "error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker).",
       "finished_at": "2026-07-30T18:43:02.951524+00:00",
-      "category": "no_data",
+      "category": "blocked",
       "duration_seconds": 59
     },
     {
@@ -1850,7 +1854,7 @@
       "started_at": "2026-06-25T19:17:15.733804+00:00",
       "status": "partial",
       "finished_at": "2026-06-25T19:18:23.962416+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 68
     },
     {
@@ -1868,7 +1872,7 @@
       "started_at": "2026-06-11T19:44:32.100958+00:00",
       "status": "partial",
       "finished_at": "2026-06-11T19:45:04.335171+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 32
     },
     {
@@ -1877,7 +1881,7 @@
       "started_at": "2026-06-04T19:30:49.193639+00:00",
       "status": "partial",
       "finished_at": "2026-06-04T19:31:28.290504+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 39
     },
     {
@@ -1886,7 +1890,7 @@
       "started_at": "2026-05-28T19:44:45.555154+00:00",
       "status": "partial",
       "finished_at": "2026-05-28T19:45:16.666164+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 31
     },
     {
@@ -1895,7 +1899,7 @@
       "started_at": "2026-05-28T14:50:57.635837+00:00",
       "status": "partial",
       "finished_at": "2026-05-28T14:51:31.822212+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 34
     },
     {
@@ -1913,7 +1917,7 @@
       "started_at": "2026-05-01T18:10:08.931834+00:00",
       "status": "partial",
       "finished_at": "2026-05-01T18:11:25.241532+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 76
     },
     {
@@ -1940,7 +1944,7 @@
       "started_at": "2026-04-28T06:29:39.643751+00:00",
       "status": "partial",
       "finished_at": "2026-04-28T06:30:22.722537+00:00",
-      "category": "none",
+      "category": "unknown",
       "duration_seconds": 43
     },
     {
@@ -2053,13 +2057,15 @@
     "success_rate_7d": 0.0,
     "success_rate_30d": 0.75,
     "category_counts_30d": {
-      "no_data": 1,
+      "blocked": 1,
       "none": 3
     },
     "last_success_at": "2026-07-23T18:21:55.291485+00:00",
     "last_finished_status": "partial",
-    "stale_days": 5,
+    "last_productive_at": "2026-07-30T18:42:04.089903+00:00",
+    "stale_days": 6,
     "is_stale": false,
+    "stale_after_days": 10,
     "total_runs": 29
   }
 }

@@ -2,8 +2,14 @@ name: Collect tension974
 
 on:
   schedule:
-    # Chaque jeudi a 17h15 UTC (21h15 a La Reunion)
+    # Collecte hebdomadaire : chaque jeudi a 17h15 UTC (21h15 a La Reunion).
     - cron: "15 17 * * 4"
+    # Rattrapages du vendredi et du samedi. Ils ne collectent QUE si la
+    # collecte hebdomadaire n'a rien ramene (voir l'etape « Faut-il
+    # collecter ? »). Raison d'etre : quand GitHub n'alloue pas de runner au
+    # cron, aucune etape ne s'execute — ni collecte, ni commit, ni alerte —
+    # donc aucun garde-fou interne au job ne peut sauver la semaine.
+    - cron: "15 5 * * 5,6"
   workflow_dispatch:
 
 concurrency:
@@ -35,11 +41,22 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
+      - name: Faut-il collecter ?
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" != "schedule" ] || [ "${{ github.event.schedule }}" = "15 17 * * 4" ]; then
+            echo "Collecte hebdomadaire ou lancement manuel : on collecte."
+            echo "needed=true" >> "$GITHUB_OUTPUT"
+          else
+            python scripts/needs_collection.py --max-age-days 6
+          fi
+
       # Timeout au niveau de l'ÉTAPE, pas seulement du job : si le timeout du
       # job se déclenchait, GitHub annulerait tout — étapes de sauvegarde
       # comprises. Ici un fetch qui pend est coupé au bout de 12 min, et il
       # reste 8 min au job pour committer ce qui a été écrit.
       - name: Collect into data/*.jsonl
+        if: ${{ steps.check.outputs.needed == 'true' }}
         timeout-minutes: 12
         env:
           # Le secret n'est visible que de cette étape, pas de pip.
@@ -51,12 +68,16 @@ jobs:
       # qu'il arrive — échec OU annulation — pour ne jamais perdre les
       # observations déjà écrites dans data/*.jsonl (y compris les échecs,
       # qui font partie de l'historique).
+      # `always()` couvre l'échec ET l'annulation de l'étape de collecte, pour
+      # ne jamais perdre les observations déjà écrites. La condition sur
+      # `check` évite en revanche de régénérer (et donc de committer) un
+      # dashboard.json identique les jours de rattrapage sans collecte.
       - name: Build GitHub Pages dashboard data
-        if: ${{ always() }}
+        if: ${{ always() && steps.check.outputs.needed == 'true' }}
         run: python scripts/build_site_data.py
 
       - name: Commit and push updated data
-        if: ${{ always() }}
+        if: ${{ always() && steps.check.outputs.needed == 'true' }}
         run: |
           git config user.name "tension974-bot"
           git config user.email "tension974-bot@users.noreply.github.com"

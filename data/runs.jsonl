@@ -58,3 +58,5 @@
 {"error_message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker).", "finished_at": "2026-07-30T18:43:02.951524+00:00", "provider": null, "run_id": "4b96d53697ed", "started_at": null, "status": "partial"}
 {"error_message": null, "finished_at": null, "provider": "firecrawl", "run_id": "84e4981b54b2", "started_at": "2026-08-07T04:37:27.658891+00:00", "status": "running"}
 {"error_message": null, "finished_at": "2026-08-07T04:38:04.246531+00:00", "provider": null, "run_id": "84e4981b54b2", "started_at": null, "status": "success"}
+{"error_message": null, "finished_at": null, "provider": "firecrawl", "run_id": "cb9937a2a94b", "started_at": "2026-08-13T18:04:07.306599+00:00", "status": "running"}
+{"error_message": null, "finished_at": "2026-08-13T18:05:59.735815+00:00", "provider": null, "run_id": "cb9937a2a94b", "started_at": null, "status": "success"}

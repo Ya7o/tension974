@@ -3,5 +3,5 @@
 # du résolveur pip. Les outils de dev/diagnostic sont dans requirements-dev.txt.
 firecrawl-py==4.34.0
 requests==2.34.2
-python-dotenv==1.2.2
+python-dotenv==1.2.3
 pyyaml==6.0.3

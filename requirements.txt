@@ -1,7 +1,7 @@
 # Dépendances d'exécution de la collecte hebdomadaire (collect.yml).
 # Versions épinglées : le job de production ne doit pas dépendre d'un choix
 # du résolveur pip. Les outils de dev/diagnostic sont dans requirements-dev.txt.
-firecrawl-py==4.34.0
+firecrawl-py==4.41.0
 requests==2.34.2
 python-dotenv==1.2.2
 pyyaml==6.0.3

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-03T19:47:51.842771+00:00",
+  "generated_at": "2026-09-10T19:38:42.754401+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -8,21 +8,25 @@
       "property_type": "Studio",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+t2+NOT+f2+NOT+t3+NOT+f3&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&price=min-800&furnished=1&owner_type=all&sort=time&order=desc&from=ms&sa=2026-04-27T05%3A32%3A29.251404Z",
       "kpis": {
-        "latest_count": 77,
-        "latest_date": "2026-09-03",
-        "delta_7d": null,
-        "delta_30d": {
-          "delta": -33,
-          "from": 110,
-          "to": 77
+        "latest_count": 70,
+        "latest_date": "2026-09-10",
+        "delta_7d": {
+          "delta": -11,
+          "from": 81,
+          "to": 70
         },
-        "latest_median_price": 684,
+        "delta_30d": {
+          "delta": -16,
+          "from": 86,
+          "to": 70
+        },
+        "latest_median_price": 669,
         "latest_average_price": 663,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 14,
-          "from": 670,
-          "to": 684
+          "delta": 19,
+          "from": 650,
+          "to": 669
         },
         "success_rate_30d": 1.0,
         "last_failure": null
@@ -759,6 +763,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-09-10T19:38:07.832979+00:00",
+          "date": "2026-09-10",
+          "success": true,
+          "count": 70,
+          "median_price": 669,
+          "average_price": 663,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -769,21 +785,25 @@
       "property_type": "T2/T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_1000&price=min-1000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A04%3A40.693455Z",
       "kpis": {
-        "latest_count": 85,
-        "latest_date": "2026-09-03",
-        "delta_7d": null,
-        "delta_30d": {
-          "delta": -1,
-          "from": 86,
-          "to": 85
+        "latest_count": 91,
+        "latest_date": "2026-09-10",
+        "delta_7d": {
+          "delta": 8,
+          "from": 83,
+          "to": 91
         },
-        "latest_median_price": 872,
-        "latest_average_price": 888,
+        "delta_30d": {
+          "delta": -8,
+          "from": 99,
+          "to": 91
+        },
+        "latest_median_price": 885,
+        "latest_average_price": 884,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": -26,
-          "from": 898,
-          "to": 872
+          "delta": 15,
+          "from": 870,
+          "to": 885
         },
         "success_rate_30d": 1.0,
         "last_failure": {
@@ -1248,6 +1268,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-09-10T19:38:17.049361+00:00",
+          "date": "2026-09-10",
+          "success": true,
+          "count": 91,
+          "median_price": 885,
+          "average_price": 884,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -1258,20 +1290,24 @@
       "property_type": "T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1+t3+OR+f3+OR+%223+pi%C3%A8ces%22+OR+%222+chambres%22&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A07%3A02.056977Z",
       "kpis": {
-        "latest_count": 30,
-        "latest_date": "2026-09-03",
-        "delta_7d": null,
+        "latest_count": 33,
+        "latest_date": "2026-09-10",
+        "delta_7d": {
+          "delta": -1,
+          "from": 34,
+          "to": 33
+        },
         "delta_30d": {
-          "delta": -9,
-          "from": 39,
-          "to": 30
+          "delta": -2,
+          "from": 35,
+          "to": 33
         },
         "latest_median_price": 1100,
-        "latest_average_price": 1212,
-        "price_sample_size": 20,
+        "latest_average_price": 1182,
+        "price_sample_size": 25,
         "price_delta_30d": {
-          "delta": -100,
-          "from": 1200,
+          "delta": -127,
+          "from": 1227,
           "to": 1100
         },
         "success_rate_30d": 1.0,
@@ -1965,11 +2001,32 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-09-10T19:38:29.541308+00:00",
+          "date": "2026-09-10",
+          "success": true,
+          "count": 33,
+          "median_price": 1100,
+          "average_price": 1182,
+          "price_sample_size": 25,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     }
   ],
   "runs": [
+    {
+      "run_id": "6bfa0ed5024d",
+      "provider": "firecrawl",
+      "started_at": "2026-09-10T19:38:07.832820+00:00",
+      "status": "success",
+      "finished_at": "2026-09-10T19:38:42.236950+00:00",
+      "category": "none",
+      "duration_seconds": 34
+    },
     {
       "run_id": "28f54fc00d50",
       "provider": "firecrawl",
@@ -2272,12 +2329,12 @@
     "category_counts_30d": {
       "none": 5
     },
-    "last_success_at": "2026-09-03T19:47:17.959635+00:00",
+    "last_success_at": "2026-09-10T19:38:07.832820+00:00",
     "last_finished_status": "success",
-    "last_productive_at": "2026-09-03T19:47:17.959635+00:00",
+    "last_productive_at": "2026-09-10T19:38:07.832820+00:00",
     "stale_days": 0,
     "is_stale": false,
     "stale_after_days": 10,
-    "total_runs": 34
+    "total_runs": 35
   }
 }

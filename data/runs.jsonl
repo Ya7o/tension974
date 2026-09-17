@@ -68,3 +68,5 @@
 {"error_message": null, "finished_at": "2026-09-03T19:47:51.491990+00:00", "provider": null, "run_id": "28f54fc00d50", "started_at": null, "status": "success"}
 {"error_message": null, "finished_at": null, "provider": "firecrawl", "run_id": "6bfa0ed5024d", "started_at": "2026-09-10T19:38:07.832820+00:00", "status": "running"}
 {"error_message": null, "finished_at": "2026-09-10T19:38:42.236950+00:00", "provider": null, "run_id": "6bfa0ed5024d", "started_at": null, "status": "success"}
+{"error_message": null, "finished_at": null, "provider": "firecrawl", "run_id": "fd408f2b31dd", "started_at": "2026-09-17T20:17:36.688458+00:00", "status": "running"}
+{"error_message": null, "finished_at": "2026-09-17T20:18:08.098330+00:00", "provider": null, "run_id": "fd408f2b31dd", "started_at": null, "status": "success"}

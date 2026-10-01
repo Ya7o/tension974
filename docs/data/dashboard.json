@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-24T20:27:31.205093+00:00",
+  "generated_at": "2026-10-01T21:48:17.845309+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -8,25 +8,25 @@
       "property_type": "Studio",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+t2+NOT+f2+NOT+t3+NOT+f3&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&price=min-800&furnished=1&owner_type=all&sort=time&order=desc&from=ms&sa=2026-04-27T05%3A32%3A29.251404Z",
       "kpis": {
-        "latest_count": 70,
-        "latest_date": "2026-09-24",
+        "latest_count": 75,
+        "latest_date": "2026-10-01",
         "delta_7d": {
-          "delta": 0,
+          "delta": 5,
           "from": 70,
-          "to": 70
+          "to": 75
         },
         "delta_30d": {
-          "delta": -17,
-          "from": 87,
-          "to": 70
+          "delta": -6,
+          "from": 81,
+          "to": 75
         },
-        "latest_median_price": 650,
-        "latest_average_price": 638,
+        "latest_median_price": 655,
+        "latest_average_price": 657,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 8,
-          "from": 642,
-          "to": 650
+          "delta": -10,
+          "from": 665,
+          "to": 655
         },
         "success_rate_30d": 1.0,
         "last_failure": null
@@ -799,6 +799,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-10-01T21:47:20.068552+00:00",
+          "date": "2026-10-01",
+          "success": true,
+          "count": 75,
+          "median_price": 655,
+          "average_price": 657,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -829,11 +841,11 @@
           "from": 910,
           "to": 898
         },
-        "success_rate_30d": 1.0,
+        "success_rate_30d": 0.8,
         "last_failure": {
-          "date": "2026-07-30",
-          "category": "blocked",
-          "message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
+          "date": "2026-10-01",
+          "category": "unknown",
+          "message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
         }
       },
       "timeseries": [
@@ -1328,6 +1340,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-10-01T21:47:27.314324+00:00",
+          "date": "2026-10-01",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "unknown",
+          "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
         }
       ]
     },
@@ -1358,11 +1382,11 @@
           "from": 1255,
           "to": 1100
         },
-        "success_rate_30d": 1.0,
+        "success_rate_30d": 0.8,
         "last_failure": {
-          "date": "2026-06-11",
-          "category": "blocked",
-          "message": "Blocked by anti-bot challenge (page asks to enable JS / disable ad blocker)."
+          "date": "2026-10-01",
+          "category": "unknown",
+          "message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
         }
       },
       "timeseries": [
@@ -2085,11 +2109,33 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-10-01T21:47:41.629858+00:00",
+          "date": "2026-10-01",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "unknown",
+          "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
         }
       ]
     }
   ],
   "runs": [
+    {
+      "run_id": "4ad87fa5e7f2",
+      "provider": "firecrawl",
+      "started_at": "2026-10-01T21:47:20.068391+00:00",
+      "status": "partial",
+      "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided.; Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided.",
+      "finished_at": "2026-10-01T21:48:17.373286+00:00",
+      "category": "unknown",
+      "duration_seconds": 57
+    },
     {
       "run_id": "cc108bae2b3b",
       "provider": "firecrawl",
@@ -2414,17 +2460,18 @@
     }
   ],
   "health": {
-    "success_rate_7d": 1.0,
-    "success_rate_30d": 1.0,
+    "success_rate_7d": 0.0,
+    "success_rate_30d": 0.8,
     "category_counts_30d": {
-      "none": 5
+      "unknown": 1,
+      "none": 4
     },
     "last_success_at": "2026-09-24T20:27:05.738277+00:00",
-    "last_finished_status": "success",
-    "last_productive_at": "2026-09-24T20:27:05.738277+00:00",
+    "last_finished_status": "partial",
+    "last_productive_at": "2026-10-01T21:47:20.068391+00:00",
     "stale_days": 0,
     "is_stale": false,
     "stale_after_days": 10,
-    "total_runs": 37
+    "total_runs": 38
   }
 }

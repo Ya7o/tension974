@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-15T20:19:32.789617+00:00",
+  "generated_at": "2026-10-22T20:32:42.954768+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -8,25 +8,25 @@
       "property_type": "Studio",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+t2+NOT+f2+NOT+t3+NOT+f3&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&price=min-800&furnished=1&owner_type=all&sort=time&order=desc&from=ms&sa=2026-04-27T05%3A32%3A29.251404Z",
       "kpis": {
-        "latest_count": 67,
-        "latest_date": "2026-10-15",
+        "latest_count": 72,
+        "latest_date": "2026-10-22",
         "delta_7d": {
-          "delta": -8,
-          "from": 75,
-          "to": 67
+          "delta": 5,
+          "from": 67,
+          "to": 72
         },
         "delta_30d": {
-          "delta": -3,
+          "delta": 2,
           "from": 70,
-          "to": 67
+          "to": 72
         },
-        "latest_median_price": 638,
-        "latest_average_price": 628,
+        "latest_median_price": 665,
+        "latest_average_price": 662,
         "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": -31,
-          "from": 669,
-          "to": 638
+          "delta": 10,
+          "from": 655,
+          "to": 665
         },
         "success_rate_30d": 1.0,
         "last_failure": null
@@ -835,6 +835,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-10-22T20:32:09.332820+00:00",
+          "date": "2026-10-22",
+          "success": true,
+          "count": 72,
+          "median_price": 665,
+          "average_price": 662,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -845,25 +857,21 @@
       "property_type": "T2/T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_1000&price=min-1000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A04%3A40.693455Z",
       "kpis": {
-        "latest_count": 83,
-        "latest_date": "2026-09-24",
-        "delta_7d": {
-          "delta": -5,
-          "from": 88,
-          "to": 83
-        },
+        "latest_count": 63,
+        "latest_date": "2026-10-22",
+        "delta_7d": null,
         "delta_30d": {
-          "delta": -4,
-          "from": 87,
-          "to": 83
+          "delta": -25,
+          "from": 88,
+          "to": 63
         },
-        "latest_median_price": 898,
-        "latest_average_price": 900,
-        "price_sample_size": 29,
+        "latest_median_price": 900,
+        "latest_average_price": 883,
+        "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": -12,
-          "from": 910,
-          "to": 898
+          "delta": 20,
+          "from": 880,
+          "to": 900
         },
         "success_rate_30d": 0.4,
         "last_failure": {
@@ -1400,6 +1408,18 @@
           "provider": "firecrawl",
           "error_category": "unknown",
           "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
+        },
+        {
+          "observed_at": "2026-10-22T20:32:19.031912+00:00",
+          "date": "2026-10-22",
+          "success": true,
+          "count": 63,
+          "median_price": 900,
+          "average_price": 883,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -1410,25 +1430,21 @@
       "property_type": "T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1+t3+OR+f3+OR+%223+pi%C3%A8ces%22+OR+%222+chambres%22&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A07%3A02.056977Z",
       "kpis": {
-        "latest_count": 37,
-        "latest_date": "2026-09-24",
-        "delta_7d": {
-          "delta": 2,
-          "from": 35,
-          "to": 37
-        },
+        "latest_count": 32,
+        "latest_date": "2026-10-22",
+        "delta_7d": null,
         "delta_30d": {
-          "delta": 1,
-          "from": 36,
-          "to": 37
+          "delta": -3,
+          "from": 35,
+          "to": 32
         },
-        "latest_median_price": 1100,
-        "latest_average_price": 1154,
-        "price_sample_size": 26,
+        "latest_median_price": 1195,
+        "latest_average_price": 1215,
+        "price_sample_size": 28,
         "price_delta_30d": {
-          "delta": -155,
-          "from": 1255,
-          "to": 1100
+          "delta": 95,
+          "from": 1100,
+          "to": 1195
         },
         "success_rate_30d": 0.4,
         "last_failure": {
@@ -2193,11 +2209,32 @@
           "provider": "firecrawl",
           "error_category": "unknown",
           "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
+        },
+        {
+          "observed_at": "2026-10-22T20:32:38.752637+00:00",
+          "date": "2026-10-22",
+          "success": true,
+          "count": 32,
+          "median_price": 1195,
+          "average_price": 1215,
+          "price_sample_size": 28,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     }
   ],
   "runs": [
+    {
+      "run_id": "3dbd095c5303",
+      "provider": "firecrawl",
+      "started_at": "2026-10-22T20:32:09.332669+00:00",
+      "status": "success",
+      "finished_at": "2026-10-22T20:32:42.568425+00:00",
+      "category": "none",
+      "duration_seconds": 33
+    },
     {
       "run_id": "0ee59ce3b358",
       "provider": "firecrawl",
@@ -2552,18 +2589,18 @@
     }
   ],
   "health": {
-    "success_rate_7d": 0.0,
+    "success_rate_7d": 1.0,
     "success_rate_30d": 0.4,
     "category_counts_30d": {
-      "unknown": 3,
-      "none": 2
+      "none": 2,
+      "unknown": 3
     },
-    "last_success_at": "2026-09-24T20:27:05.738277+00:00",
-    "last_finished_status": "partial",
-    "last_productive_at": "2026-10-15T20:18:33.822347+00:00",
+    "last_success_at": "2026-10-22T20:32:09.332669+00:00",
+    "last_finished_status": "success",
+    "last_productive_at": "2026-10-22T20:32:09.332669+00:00",
     "stale_days": 0,
     "is_stale": false,
     "stale_after_days": 10,
-    "total_runs": 40
+    "total_runs": 41
   }
 }

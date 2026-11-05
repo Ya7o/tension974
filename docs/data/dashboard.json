@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-29T21:46:26.400470+00:00",
+  "generated_at": "2026-11-05T22:40:15.246320+00:00",
   "searches": [
     {
       "id": "studio_saint_denis",
@@ -8,25 +8,25 @@
       "property_type": "Studio",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+t2+NOT+f2+NOT+t3+NOT+f3&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&price=min-800&furnished=1&owner_type=all&sort=time&order=desc&from=ms&sa=2026-04-27T05%3A32%3A29.251404Z",
       "kpis": {
-        "latest_count": 66,
-        "latest_date": "2026-10-29",
+        "latest_count": 68,
+        "latest_date": "2026-11-05",
         "delta_7d": {
-          "delta": -6,
-          "from": 72,
-          "to": 66
+          "delta": 2,
+          "from": 66,
+          "to": 68
         },
         "delta_30d": {
-          "delta": -4,
-          "from": 70,
-          "to": 66
+          "delta": -7,
+          "from": 75,
+          "to": 68
         },
-        "latest_median_price": 670,
-        "latest_average_price": 658,
-        "price_sample_size": 29,
+        "latest_median_price": 648,
+        "latest_average_price": 644,
+        "price_sample_size": 30,
         "price_delta_30d": {
-          "delta": 20,
-          "from": 650,
-          "to": 670
+          "delta": -7,
+          "from": 655,
+          "to": 648
         },
         "success_rate_30d": 1.0,
         "last_failure": null
@@ -859,6 +859,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-11-05T22:39:34.768403+00:00",
+          "date": "2026-11-05",
+          "success": true,
+          "count": 68,
+          "median_price": 648,
+          "average_price": 644,
+          "price_sample_size": 30,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     },
@@ -891,7 +903,7 @@
         },
         "success_rate_30d": 0.4,
         "last_failure": {
-          "date": "2026-10-15",
+          "date": "2026-11-05",
           "category": "unknown",
           "message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
         }
@@ -1448,6 +1460,18 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-11-05T22:39:38.791279+00:00",
+          "date": "2026-11-05",
+          "success": false,
+          "count": null,
+          "median_price": null,
+          "average_price": null,
+          "price_sample_size": null,
+          "provider": "firecrawl",
+          "error_category": "unknown",
+          "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided."
         }
       ]
     },
@@ -1458,27 +1482,27 @@
       "property_type": "T3",
       "url": "https://www.leboncoin.fr/recherche?category=10&text=NOT+studio+NOT+t1+NOT+f1+t3+OR+f3+OR+%223+pi%C3%A8ces%22+OR+%222+chambres%22&locations=Saint-Denis__-20.905210884748794_55.475948319967685_7424_5000&furnished=1&real_estate_type=2&owner_type=all&sort=time&order=desc&from=ms&sa=2026-03-28T17%3A07%3A02.056977Z",
       "kpis": {
-        "latest_count": 33,
-        "latest_date": "2026-10-29",
+        "latest_count": 23,
+        "latest_date": "2026-11-05",
         "delta_7d": {
-          "delta": 1,
-          "from": 32,
-          "to": 33
+          "delta": -10,
+          "from": 33,
+          "to": 23
         },
         "delta_30d": {
-          "delta": -4,
+          "delta": -14,
           "from": 37,
-          "to": 33
+          "to": 23
         },
-        "latest_median_price": 1180,
-        "latest_average_price": 1176,
-        "price_sample_size": 27,
+        "latest_median_price": 1220,
+        "latest_average_price": 1273,
+        "price_sample_size": 19,
         "price_delta_30d": {
-          "delta": 80,
+          "delta": 120,
           "from": 1100,
-          "to": 1180
+          "to": 1220
         },
-        "success_rate_30d": 0.4,
+        "success_rate_30d": 0.6,
         "last_failure": {
           "date": "2026-10-15",
           "category": "unknown",
@@ -2265,11 +2289,33 @@
           "provider": "firecrawl",
           "error_category": "none",
           "error_message": null
+        },
+        {
+          "observed_at": "2026-11-05T22:40:01.514409+00:00",
+          "date": "2026-11-05",
+          "success": true,
+          "count": 23,
+          "median_price": 1220,
+          "average_price": 1273,
+          "price_sample_size": 19,
+          "provider": "firecrawl",
+          "error_category": "none",
+          "error_message": null
         }
       ]
     }
   ],
   "runs": [
+    {
+      "run_id": "84e4dca078d3",
+      "provider": "firecrawl",
+      "started_at": "2026-11-05T22:39:34.768214+00:00",
+      "status": "partial",
+      "error_message": "Internal Server Error: Failed to scrape. All scraping engines failed to retrieve content from this URL. Engines tried: [index, index;documents, fire-engine;chrome-cdp;stealth, fire-engine(retry);chrome-cdp;stealth, pdf, document, image]. This usually happens when: (1) The URL is invalid or the page doesn't exist (404), (2) The website is blocking automated access, (3) The website is down or unreachable, (4) The page requires authentication. Double check the URL is correct and accessible in a browser. If the issue persists, contact us at help@firecrawl.com with your request ID for investigation. - No additional error details provided.",
+      "finished_at": "2026-11-05T22:40:14.764817+00:00",
+      "category": "unknown",
+      "duration_seconds": 40
+    },
     {
       "run_id": "eea0d01c9e42",
       "provider": "firecrawl",
@@ -2642,18 +2688,18 @@
     }
   ],
   "health": {
-    "success_rate_7d": 1.0,
+    "success_rate_7d": 0.0,
     "success_rate_30d": 0.4,
     "category_counts_30d": {
-      "none": 2,
-      "unknown": 3
+      "unknown": 3,
+      "none": 2
     },
     "last_success_at": "2026-10-29T21:45:58.033500+00:00",
-    "last_finished_status": "success",
-    "last_productive_at": "2026-10-29T21:45:58.033500+00:00",
+    "last_finished_status": "partial",
+    "last_productive_at": "2026-11-05T22:39:34.768214+00:00",
     "stale_days": 0,
     "is_stale": false,
     "stale_after_days": 10,
-    "total_runs": 42
+    "total_runs": 43
   }
 }
